@@ -5,6 +5,9 @@
  */
 import forOwn from 'lodash/forOwn';
 import uniq from 'lodash/uniq';
+import get from 'lodash/get';
+import set from 'lodash/set';
+import isPlainObject from 'lodash/isPlainObject';
 
 import Session from './Session';
 import QuerySet from './QuerySet';
@@ -14,12 +17,11 @@ import {
   OneToOne,
   attr
 } from './fields';
-import { CREATE, UPDATE, DELETE, FILTER } from './constants';
+import { CREATE, UPDATE, DELETE, FILTER, REG_JAVASCRIPT_VALID_VARIABLE_NAME } from './constants';
 import {
   normalizeEntity,
   arrayDiffActions,
   objectShallowEquals,
-  warnDeprecated,
   m2mName
 } from './utils';
 
@@ -41,7 +43,7 @@ function getByIdQuery (modelInstance) {
   };
 }
 
-// Table 作为底层抽象，确实不适合将 Model 的逻辑混合在里面，故还是延续了 redux-orm 将 Model 拆除了的方式
+// Table 作为底层抽象，确实不适合将 Model 的逻辑混合在里面，故还是延续了 redux-orm 将 Model 拆出来的方式
 const Model = class Model {
   constructor (fields) {
     this.initFields(fields);
@@ -88,15 +90,10 @@ const Model = class Model {
   }
 
   static _getTableOpts () {
-    if (typeof this.backend === 'function') {
-      warnDeprecated('Model.backend is deprecated. Please rename to .options');
-      return this.backend();
-    } else if (this.backend) {
-      warnDeprecated('Model.backend is deprecated. Please rename to .options');
-      return this.backend;
-    } else if (typeof this.options === 'function') {
+    if (typeof this.options === 'function') {
       return this.options();
     }
+
     return this.options;
   }
 
@@ -451,9 +448,62 @@ const Model = class Model {
    * @param  {Object} userMergeObj - an object that will be merged with this instance.
    * @return {undefined}
    */
-  update (userMergeObj) {
-    const ThisModel = this.getClass();
-    const mergeObj = Object.assign({}, userMergeObj);
+  update (newItem, other) {
+    let mergeObj = { [this.constructor.idAttribute]: this[this.idAttribute] };
+
+    // 使 newItem 支持字符串
+    if (typeof newItem === 'string') {
+      const nestedKey = newItem;
+      newItem = other;
+
+      let currentObj = this;
+      let hasVisitedKey = '';
+      nestedKey.split('.').reduce((nest, key, index, arr) => {
+        hasVisitedKey += key;
+
+        if (index === arr.length - 1) {
+          nest[key] = other;
+        } else {
+          currentObj = get(currentObj, key);
+
+          let temp;
+          if (typeof currentObj !== 'object') {
+            if (index !== arr.length - 1) {
+              const remainKey = nestedKey.slice(hasVisitedKey.length);
+
+              throw new Error(`your object is `, newItem, ` and you want to update ${nestedKey}, and currently
+              we visit on ${hasVisitedKey}, but newItem.${hasVisitedKey} is ${currentObj}, it's not a object
+              or an array, so we can't continue to visit for the remain key(i.e. ${remainKey}), so please adjust your
+              key`
+              );
+            } else {
+              temp = newItem;
+            }
+          }
+
+          temp = { ...currentObj };
+          set(nest, 'key', temp);
+
+          return temp;
+        }
+      }, mergeObj);
+    } else if (isPlainObject(newItem)) {
+      for (const v of newItem) {
+        if (typeof v === 'object') {
+          throw new Error(`When your newItem is an object, it's value of each key must be a non-object/array,
+            if you want to update a more deep structure, please make newItem as a string
+            (i.e. model.update('foo.bar', newItem)`
+          );
+        }
+      }
+
+      mergeObj = { ...mergeObj, ...newItem };
+    } else {
+      throw new Error(`newItem must be a string or a plain object, but passed in ${newItem}`);
+    }
+
+    // 下面才是更新相关操作
+    const ThisModel = this.constructor;
 
     const fields = ThisModel.fields;
     const virtualFields = ThisModel.virtualFields;
@@ -462,12 +512,15 @@ const Model = class Model {
     // If an array of entities or id's is supplied for a
     // many-to-many related field, clear the old relations
     // and add the new ones.
-    for (const mergeKey in mergeObj) { // eslint-disable-line no-restricted-syntax, guard-for-in
-      const isRealField = fields.hasOwnProperty(mergeKey);
+    for (const updatedKey in mergeObj) { // eslint-disable-line no-restricted-syntax, guard-for-in
+      if (fields.hasOwnProperty(updatedKey)) {
+        const field = fields[updatedKey];
 
-      if (isRealField) {
-        const field = fields[mergeKey];
-
+        // 如果新的 field 是 fk 或者 many，那么 field 既支持字符串，也支持对象/数组
+        // 1. 当为字符串时，代表是一个 fk 的 id，即将 fk 的 id 由一个值变为另一个值，所以这个 id 必须在 fk 对
+        // 应的 Model 中已经存在
+        // 2. 当为对象时，代表是一个 fk 或者 many 的实例，即新增了一个实例作为新的 field 的值，所以不仅要更新此 Model，
+        // 还要在 fk 和 many 对应的 Model 里面 create 这个实例
         if (field instanceof ForeignKey || field instanceof OneToOne) {
           // update one-one/fk relations
           mergeObj[mergeKey] = normalizeEntity(mergeObj[mergeKey]);
@@ -486,12 +539,14 @@ const Model = class Model {
       }
     }
 
+    // 对于不属于 fileds 里面的属性，需要直接加到 model 实例上
     this.initFields(Object.assign({}, this._fields, mergeObj));
+
+    // 对于 many，需要同步
     this._refreshMany2Many(m2mRelations); // eslint-disable-line no-underscore-dangle
 
-    ThisModel.session.applyUpdate({
+    ThisModel.session.execute({
       action: UPDATE,
-      query: getByIdQuery(this),
       payload: mergeObj
     });
   }
@@ -529,25 +584,16 @@ const Model = class Model {
       } else if (field instanceof ForeignKey) {
         const relatedQs = this[key];
         if (relatedQs.exists()) {
-          relatedQs.update({ [field.relatedName]: null });
+          relatedQs.update({ [field.keyInToMoel]: null });
         }
       } else if (field instanceof OneToOne) {
         // Set null to any foreign keys or one to ones pointed to
         // this instance.
         if (this[key] !== null) {
-          this[key][field.relatedName] = null;
+          this[key][field.keyInToMoel] = null;
         }
       }
     }
-  }
-
-  // DEPRECATED AND REMOVED METHODS
-
-  getNextState () {
-    throw new Error(
-      'Model.prototype.getNextState is removed. See the 0.9 ' +
-      'migration guide on the GitHub repo.'
-    );
   }
 };
 

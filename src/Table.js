@@ -5,20 +5,61 @@
  */
 
 import deepMerge from 'lodash/merge';
+import filter from 'lodash/filter';
+import sortBy from 'lodash/sortBy';
+import reject from 'lodash/reject';
+import orderBy from 'lodash/orderBy';
+import isArray from 'lodash/isArray';
+import isString from 'lodash/isString';
+import includes from 'lodash/includes';
 
-import { SYMBOL_TABLE } from './constants';
+import ops from './immutable-ops';
+import { SYMBOL_TABLE, FILTER, EXCLUDE, ORDER_BY } from './constants';
 
-const DEFAULT_TABLE_FIELDS = {
+// 数字越小代表操作优先级越高
+const OPERATION_PRIORIYY_MAP = {
+  FILTER: 1,
+  EXCLUDE: 2,
+  DEFAULT: 999
+};
+
+const getOperationPriority = ({ type, payload }) => {
+  const priority = OPERATION_PRIORIYY_MAP[type];
+
+  if (priority) {
+    return priority;
+  }
+
+  return OPERATION_PRIORIYY_MAP.DEFAULT;
+};
+
+const DEFAULT_TABLE_ATTRIBUTES = {
   idAttribute: 'id'
 };
 
-const getItemId = table => table[table.idAttribute];
-
 export default class Table {
-  constructor (fields) {
+  constructor (userAttributes) {
     this.$$typeof = SYMBOL_TABLE;
     this.ids = [];
     this.itemsById = {};
+
+    Object.assign(this, DEFAULT_TABLE_ATTRIBUTES, userAttributes);
+  }
+
+  getItemId (item) {
+    if (item.hasOwnProperty(this.idAttribute)) {
+      return item[this.idAttribute];
+    } else {
+      throw new Error(`The item ${JSON.stringify(item)} does not have the key \`${this.idAttribute}\` as the idAttribute`);
+    }
+  };
+
+  get state () {
+    // eslint-disable-next-line
+    return this.state || (this.state = {
+      ids: this.ids,
+      itemsById: this.itemsById
+    });
   }
 
   withId (id) {
@@ -31,13 +72,13 @@ export default class Table {
   }
 
   // insert 对于 id 已存在的情况会抛错，如果对于 id 已存在的情况想进行更新，请调用 upsert 方法
-  insert (item) {
+  insert (item, { batchToken }) {
     return new Promise((resolve, reject) => {
-      const itemId = getItemId(item);
+      const itemId = this.getItemId(item);
 
       if (!this.hasId(itemId)) {
-        this.ids.push(itemId);
-        this.itemsById[itemId] = item;
+        this.ids = ops.batch.push(batchToken, itemId, this.ids);
+        this.itemsById = ops.batch.merge(batchToken, { [itemId]: item }, this.itemsById);
 
         resolve();
       } else {
@@ -49,34 +90,27 @@ export default class Table {
   // create or update
   // upsert 对于 id 已存在的情况会进行 update，而 insert 则会抛错
   upsert (item) {
-    return new Promise((resolve, reject) => {
-      const itemId = getItemId(item);
+    return Promise.resolve().then(() => {
+      const itemId = this.getItemId(item);
 
       if (!this.hasId(itemId)) {
         this.insert(item);
       } else {
         this.update(item);
       }
-
-      resolve();
     });
   }
 
-  // 更新时默认是 shallow merge
-  update (newItem, { isDeepMerge = true }) {
+  update (newItem, { batchToken }) {
     return new Promise((resolve, reject) => {
-      const itemId = getItemId(newItem);
+      const itemId = this.getItemId(newItem);
       const oldItem = this.itemsById[itemId];
 
       if (this.hasId(itemId)) {
-        if (isDeepMerge) {
-          this.itemsById[itemId] = deepMerge({ ...oldItem }, newItem);
-        } else {
-          this.itemsById[itemId] = {
-            ...oldItem,
-            ...newItem
-          };
-        }
+        const result = ops.batch.merge(batchToken, newItem, this.itemsById[newItem[this.idAttribute]]);
+        const newItemsById = ops.batch.set(batchToken, result[this.idAttribute], result, this.itemsById);
+
+        ops.batch.set(batchToken, 'itemsById', newItemsById, this.itemsById);
       } else {
         reject(new Error(`Update error: the item of ${this.idAttribute}(${itemId}) doesn't exist in the ${this.constructor.name} Table`));
       }
@@ -85,27 +119,76 @@ export default class Table {
     });
   }
 
-  delete (item) {
+  delete (deletedIds, { batchToken }) {
+    if (typeof deletedIds === 'function') {
+      deletedIds = deletedIds();
+    } else if (isString(deletedIds)) {
+      deletedIds = [deletedIds];
+    } else if (isArray(deletedIds)) {
+      deletedIds = deletedIds.map(v =>
+        isString(v)
+        ? v
+        : v[this.idAttribute]
+      );
+    } else {
+      return Promise.reject(new Error(`DeletedIds argument must be a function, string or an array but passed in ${deletedIds}`));
+    }
+
     return new Promise((resolve, reject) => {
-      const itemId = getItemId(item);
+      for (const itemId of deletedIds) {
+        if (!this.hasId(itemId)) {
+          reject(new Error(`Delete error: the item of ${this.idAttribute}(${itemId}) doesn't exist in the ${this.constructor.name} Table`));
 
-      if (this.hasId(itemId)) {
-        this.ids.splice(this.ids.indexOf(itemId), 1);
-        delete this.itemsById[itemId];
-
-        resolve();
-      } else {
-        reject(new Error(`Delete error: the item of ${this.idAttribute}(${itemId}) doesn't exist in the ${this.constructor.name} Table`));
+          return;
+        }
       }
+
+      this.ids = ops.batch.filter(
+        batchToken,
+        id => !includes(deletedIds, id),
+        this.ids
+      );
+
+      this.itemsById = ops.batch.omit(
+        batchToken,
+        deletedIds,
+        this.itemsById
+      );
+
+      resolve();
     });
   }
 
-  query () {
+  query (item, operations) {
+    // 先进行 filter，然后是 exclude，最后是其它，目的是加快查询
+    // TODO 之前看的一个 youtube 视频讲到了函数的 lazyload 执行，比这种要先进很多，但是好像是理论模型
+    // 之前找过一次没找到，后面再看看吧
+    const optimizedOperations = sortBy(operations, getOperationPriority);
 
+    return optimizedOperations.reduce((items, { type, payload }, index) => {
+      switch (type) {
+        case FILTER: {
+          return filter(items, payload);
+        }
+
+        case EXCLUDE: {
+          return reject(items, payload);
+        }
+
+        case ORDER_BY: {
+          const { iteratees, orders } = payload;
+
+          return orderBy(items, iteratees, orders);
+        }
+
+        default:
+          return items;
+      }
+    }, this.getItemsArray());
   }
 
   getItemsArray () {
-
+    return this.ids.map(id => this.itemsById[id]);
   }
 }
 
