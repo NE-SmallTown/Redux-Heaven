@@ -121,7 +121,7 @@ function attachQuerySetMethods (modelClass, querySetClass) {
  * @param  {*} entity - either a Model instance or an id value
  * @return {*} the id value of `entity`
  */
-function normalizeEntity (entity) {
+function selectId (entity) {
   if (entity !== null &&
     typeof entity !== 'undefined' &&
     typeof entity.getId === 'function') {
@@ -171,7 +171,7 @@ export {
   m2mName,
   m2mFromFieldName,
   m2mToFieldName,
-  normalizeEntity,
+  selectId,
   reverseFieldErrorMessage,
   objectShallowEquals,
   ops,

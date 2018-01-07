@@ -17,4 +17,4 @@ export const ORDER_BY = 'REDUX_HEAVEN_ORM_ORDER_BY';
 export const SUCCESS = 'REDUX_HEAVEN_SUCCESS';
 export const FAILURE = 'REDUX_HEAVEN_FAILURE';
 
-export const REG_JAVASCRIPT_VALID_VARIABLE_NAME = /^[a-zA-Z_$][0-9a-zA-Z_$]*$/;
+// export const REG_JAVASCRIPT_VALID_VARIABLE_NAME = /^[a-zA-Z_$][0-9a-zA-Z_$]*$/;

@@ -6,7 +6,7 @@
 
 import { CREATE, UPDATE, DELETE } from './constants';
 
-let dataBaseState;
+let dataBaseState = {};
 
 function execute (executeSpec, tables, tx) {
   const { action, payload } = executeSpec;
@@ -47,14 +47,14 @@ export const createDataBase = tables => {
 
   return {
     createReducer: () => (state, action) => {
-      tables.forEach(table => {
+      return tables.reduce((ret, table) => {
         const tableClass = table.constructor;
         if (typeof tableClass.reducer !== 'function') {
-          throw Error(`there is no reducer function in class(${tableClass.name})`);
+          throw Error(`there is no static reducer function in class(${tableClass.name})`);
         } else {
           tableClass.reducer(state, action, tableClass);
         }
-      });
+      }, {});
     }
   };
 };

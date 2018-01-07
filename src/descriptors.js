@@ -1,6 +1,6 @@
 import difference from 'lodash/difference';
 import {
-    normalizeEntity,
+    selectId,
     includes
 } from './utils';
 
@@ -25,10 +25,12 @@ function fieldToFkModelObjDescriptor (fieldName, declaredToModelName) {
       const currentSession = this.getClass().session;
       const declaredToModel = currentSession[declaredToModelName];
       const toId = this._fields[fieldName];
+
       if (typeof toId !== 'undefined' && toId !== null) {
         return declaredToModel.withId(toId);
       }
-      return undefined;
+
+      return;
     },
     set (value) {
       const currentSession = this.getClass().session;
@@ -53,7 +55,13 @@ function fkModelObjToFieldDescriptor (declaredFieldName, declaredFromModelName) 
       const currentSession = this.getClass().session;
       const declaredFromModel = currentSession[declaredFromModelName];
       const thisId = this.getId();
-      return declaredFromModel.filter({ [declaredFieldName]: thisId });
+      // session.Host.withId(hostId).replies 会执行到这些，然后接下来执行 .filter，.filter 会返回 QuerySet，
+      // 所以才能够继续执行 .replies.toRefArray()，但是默认情况下我们并不需要执行 .toRefArray()，因为大多数情况
+      // 本身就希望得到的是 refArray，而不是 QuerySet，所以这里改成默认返回 refArray，如果需要返回 QuerySet，
+      // 则需要用显式的方式，即 model.getQuerySet()
+      // 原本代码为：return declaredFromModel.filter({ [declaredFieldName]: thisId });
+      // 修改后代码为：
+      return declaredFromModel.filter({ [declaredFieldName]: thisId }).toRefArray();
     },
     set () {
       throw new Error('Can\'t mutate a reverse many-to-one relation.');
@@ -115,7 +123,7 @@ function manyToManyDescriptor (
             );
 
       qs.add = function add (...args) {
-        const idsToAdd = args.map(normalizeEntity);
+        const idsToAdd = args.map(selectId);
 
         const filterWithAttr = reverse ? fromFieldName : toFieldName;
 
@@ -158,7 +166,7 @@ function manyToManyDescriptor (
       };
 
       qs.remove = function remove (...entities) {
-        const idsToRemove = entities.map(normalizeEntity);
+        const idsToRemove = entities.map(selectId);
 
         const attrInIdsToRemove = reverse ? fromFieldName : toFieldName;
         const entitiesToDelete = throughQs.filter(

@@ -17,9 +17,9 @@ import {
   OneToOne,
   attr
 } from './fields';
-import { CREATE, UPDATE, DELETE, FILTER, REG_JAVASCRIPT_VALID_VARIABLE_NAME } from './constants';
+import { CREATE, UPDATE, DELETE, FILTER } from './constants';
 import {
-  normalizeEntity,
+  selectId,
   arrayDiffActions,
   objectShallowEquals,
   m2mName
@@ -125,6 +125,7 @@ const Model = class Model {
     if (!(session instanceof Session)) {
       throw Error('A model can only connect to a Session instance.');
     }
+
     this._session = session;
   }
 
@@ -139,8 +140,7 @@ const Model = class Model {
   }
 
   static getQuerySet () {
-    const QuerySetClass = this.querySetClass;
-    return new QuerySetClass(this);
+    return new QuerySet(this);
   }
 
   static invalidateClassCache () {
@@ -174,7 +174,8 @@ const Model = class Model {
       const field = virtualFields[name];
       const values = relations[name];
 
-      const normalizedNewIds = values.map(normalizeEntity);
+      // TODO 替换成 lodash 的 values 函数
+      const normalizedNewIds = values.map(selectId);
       const uniqueIds = uniq(normalizedNewIds);
 
       if (normalizedNewIds.length !== uniqueIds.length) {
@@ -222,28 +223,31 @@ const Model = class Model {
    * @return {Model} a new {@link Model} instance.
    */
   static create (userProps) {
-    const props = Object.assign({}, userProps);
+    const props = {...userProps};
 
     const m2mRelations = {};
 
-    const declaredFieldNames = Object.keys(this.fields);
     const declaredVirtualFieldNames = Object.keys(this.virtualFields);
 
-    declaredFieldNames.forEach((key) => {
-      const field = this.fields[key];
-      const valuePassed = userProps.hasOwnProperty(key);
-      if (!(field instanceof ManyToMany)) {
-        if (valuePassed) {
-          const value = userProps[key];
-          props[key] = normalizeEntity(value);
-        } else if (field.getDefault) {
-          props[key] = field.getDefault();
-        }
-      } else if (valuePassed) {
+    Object.keys(this.fields).forEach(fieldKey => {
+      const modelField = this.fields[fieldKey];
+      const userPropsField = userProps[fieldKey];
+      const userPropsHasFieldKey = userProps.hasOwnProperty(fieldKey);
+
+      if (modelField instanceof ManyToMany && userPropsHasFieldKey) {
         // If a value is supplied for a ManyToMany field,
         // discard them from props and save for later processing.
-        m2mRelations[key] = userProps[key];
-        delete props[key];
+        m2mRelations[fieldKey] = userPropsField;
+        delete props[fieldKey];
+
+        return;
+      }
+
+      if (!(modelField instanceof ManyToMany)) {
+        // 对于 ForeignKey，存储的不应是实体，而是实体的 id
+        // 即 reply.author 不应该是一个对象，而应该是 author 的 id
+        // 而对于基础类型（即普通的 Attribute），存储的就是基本类型
+        props[fieldKey] = userPropsHasFieldKey ? selectId(userPropsField) : field.getDefault();
       }
     });
 
@@ -301,12 +305,13 @@ const Model = class Model {
    * @throws If object with id `id` doesn't exist
    * @return {Model} {@link Model} instance with id `id`
    */
-  static withId (id) {
+  static withId (id, notExistReturn = []) {
+    if (!this.hasId(id)) {
+      return notExistReturn;
+    }
+
     const ModelClass = this;
     const rows = this._findDatabaseRows({ [ModelClass.idAttribute]: id });
-    if (rows.length === 0) {
-      throw new Error(`${ModelClass.modelName} instance with id ${id} not found`);
-    }
 
     return new ModelClass(rows[0]);
   }
@@ -523,7 +528,7 @@ const Model = class Model {
         // 还要在 fk 和 many 对应的 Model 里面 create 这个实例
         if (field instanceof ForeignKey || field instanceof OneToOne) {
           // update one-one/fk relations
-          mergeObj[mergeKey] = normalizeEntity(mergeObj[mergeKey]);
+          mergeObj[mergeKey] = selectId(mergeObj[mergeKey]);
         } else if (field instanceof ManyToMany) {
           // field is forward relation
           m2mRelations[mergeKey] = mergeObj[mergeKey];
@@ -601,6 +606,5 @@ Model.fields = {
   id: attr()
 };
 Model.virtualFields = {};
-Model.querySetClass = QuerySet;
 
 export default Model;

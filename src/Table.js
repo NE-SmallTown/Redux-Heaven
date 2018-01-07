@@ -16,21 +16,21 @@ import includes from 'lodash/includes';
 import ops from './immutable-ops';
 import { SYMBOL_TABLE, FILTER, EXCLUDE, ORDER_BY } from './constants';
 
-// 数字越小代表操作优先级越高
-const OPERATION_PRIORIYY_MAP = {
-  FILTER: 1,
-  EXCLUDE: 2,
-  DEFAULT: 999
-};
+// 越靠前的代表操作优先级越高
+const OPERATION_PRIORIYY_QUEUE = [
+  FILTER,
+  EXCLUDE,
+  ORDER_BY
+];
 
 const getOperationPriority = ({ type, payload }) => {
-  const priority = OPERATION_PRIORIYY_MAP[type];
+  const priority = OPERATION_PRIORIYY_QUEUE.indexOf(type);
 
   if (priority) {
     return priority;
   }
 
-  return OPERATION_PRIORIYY_MAP.DEFAULT;
+  return OPERATION_PRIORIYY_QUEUE.DEFAULT;
 };
 
 const DEFAULT_TABLE_ATTRIBUTES = {
