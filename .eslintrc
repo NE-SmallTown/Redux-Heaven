@@ -29,7 +29,6 @@
     "func-call-spacing": 0,
     "no-unexpected-multiline": 0,
     "no-empty-pattern": 0,
-
     // overide standard-react
     "standard/object-curly-even-spacing": 0,
     "react/no-array-index-key": 2,
@@ -44,7 +43,6 @@
     "react/no-render-return-value": 2,
     "react/no-string-refs": 2,
     "react/no-unescaped-entities": 2,
-    "react/no-unknown-property": [2, { "ignore": ["styleName", "styles", "xlink:href"] }], // react-css-modules
     "react/prefer-es6-class": [2, "always"],
     "react/prefer-stateless-function": [1, { "ignorePureComponents": true }],
     "react/require-render-return": 2,
@@ -53,13 +51,10 @@
       "html": true
     }],
     "react/style-prop-object": 2,
-    "react/no-unused-prop-types": 0,
     // overide standard-jsx
     "react/jsx-indent": [0, "tab"],
-
-
     // custom
-    "key-spacing"          : 0,
+    "key-spacing"          : [0],
     "jsx-quotes"           : [1, "prefer-double"],
     "max-len"              : [2, 150, 2],
     "object-curly-spacing" : [2, "always"],

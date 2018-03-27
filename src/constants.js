@@ -6,6 +6,7 @@
 
 export const SYMBOL_TABLE = Symbol.for('redux-heaven.Table');
 
+export const QUERY = 'REDUX_HEAVEN_ORM_QUERY';
 export const UPDATE = 'REDUX_HEAVEN_ORM_UPDATE';
 export const DELETE = 'REDUX_HEAVEN_ORM_DELETE';
 export const CREATE = 'REDUX_HEAVEN_ORM_CREATE';

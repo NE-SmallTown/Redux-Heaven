@@ -37,6 +37,8 @@ const DEFAULT_TABLE_ATTRIBUTES = {
   idAttribute: 'id'
 };
 
+// TODO 数据库操作目前都使用的同步带 Promise，目的是为了将来可能的异步扩展
+// 到时候只需要在异步完成的时候再 dispatch 一个 action 就行了
 export default class Table {
   constructor (userAttributes) {
     this.$$typeof = SYMBOL_TABLE;
@@ -57,9 +59,13 @@ export default class Table {
   get state () {
     // eslint-disable-next-line
     return this.state || (this.state = {
-      ids: this.ids,
+      ids      : this.ids,
       itemsById: this.itemsById
     });
+  }
+
+  makeStateShallowMergeItSelf () {
+    this.state = { ...this.state };
   }
 
   withId (id) {
@@ -79,6 +85,8 @@ export default class Table {
       if (!this.hasId(itemId)) {
         this.ids = ops.batch.push(batchToken, itemId, this.ids);
         this.itemsById = ops.batch.merge(batchToken, { [itemId]: item }, this.itemsById);
+
+        this.makeStateShallowMergeItSelf();
 
         resolve();
       } else {
@@ -110,6 +118,8 @@ export default class Table {
         const result = ops.batch.merge(batchToken, newItem, this.itemsById[newItem[this.idAttribute]]);
         const newItemsById = ops.batch.set(batchToken, result[this.idAttribute], result, this.itemsById);
 
+        this.makeStateShallowMergeItSelf();
+
         ops.batch.set(batchToken, 'itemsById', newItemsById, this.itemsById);
       } else {
         reject(new Error(`Update error: the item of ${this.idAttribute}(${itemId}) doesn't exist in the ${this.constructor.name} Table`));
@@ -127,8 +137,8 @@ export default class Table {
     } else if (isArray(deletedIds)) {
       deletedIds = deletedIds.map(v =>
         isString(v)
-        ? v
-        : v[this.idAttribute]
+          ? v
+          : v[this.idAttribute]
       );
     } else {
       return Promise.reject(new Error(`DeletedIds argument must be a function, string or an array but passed in ${deletedIds}`));
@@ -154,6 +164,8 @@ export default class Table {
         deletedIds,
         this.itemsById
       );
+
+      this.makeStateShallowMergeItSelf();
 
       resolve();
     });

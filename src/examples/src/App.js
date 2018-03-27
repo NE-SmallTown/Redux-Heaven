@@ -10,7 +10,6 @@ import React from 'react';
 
 export default class App extends React.PureComponent {
   render () {
-
     return (
       <div>
         <div style={{ marginBottom: '100px', fontSize: '16px' }}>

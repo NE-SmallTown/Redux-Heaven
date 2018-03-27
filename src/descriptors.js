@@ -1,7 +1,7 @@
 import difference from 'lodash/difference';
 import {
-    selectId,
-    includes
+  normalizeEntity,
+  includes
 } from './utils';
 
 function attrDescriptor (fieldName) {
@@ -91,11 +91,11 @@ function oneModelObjToFieldDescriptor (declaredFieldName, declaredFromModelName)
 
 // Both sides of Many to Many, use the reverse flag.
 function manyToManyDescriptor (
-    declaredFromModelName,
-    declaredToModelName,
-    throughModelName,
-    throughFields,
-    reverse) {
+  declaredFromModelName,
+  declaredToModelName,
+  throughModelName,
+  throughFields,
+  reverse) {
   return {
     get () {
       const currentSession = this.getClass().session;
@@ -119,11 +119,11 @@ function manyToManyDescriptor (
 
       const qsFromModel = reverse ? declaredFromModel : declaredToModel;
       const qs = qsFromModel.filter(attrs =>
-                includes(toIds, attrs[qsFromModel.idAttribute])
-            );
+        includes(toIds, attrs[qsFromModel.idAttribute])
+      );
 
       qs.add = function add (...args) {
-        const idsToAdd = args.map(selectId);
+        const idsToAdd = args.map(normalizeEntity);
 
         const filterWithAttr = reverse ? fromFieldName : toFieldName;
 
@@ -131,16 +131,16 @@ function manyToManyDescriptor (
 
         if (existingQs.exists()) {
           const existingIds = existingQs
-                        .toRefArray()
-                        .map(through => through[filterWithAttr]);
+            .toRefArray()
+            .map(through => through[filterWithAttr]);
 
           const toAddModel = reverse
-                        ? declaredFromModel.modelName
-                        : declaredToModel.modelName;
+            ? declaredFromModel.modelName
+            : declaredToModel.modelName;
 
           const addFromModel = reverse
-                        ? declaredToModel.modelName
-                        : declaredFromModel.modelName;
+            ? declaredToModel.modelName
+            : declaredFromModel.modelName;
           throw new Error(`Tried to add already existing ${toAddModel} id(s) ${existingIds} to the ${addFromModel} instance with id ${thisId}`);
         }
 
@@ -166,28 +166,28 @@ function manyToManyDescriptor (
       };
 
       qs.remove = function remove (...entities) {
-        const idsToRemove = entities.map(selectId);
+        const idsToRemove = entities.map(normalizeEntity);
 
         const attrInIdsToRemove = reverse ? fromFieldName : toFieldName;
         const entitiesToDelete = throughQs.filter(
-                    through => includes(idsToRemove, through[attrInIdsToRemove])
-                );
+          through => includes(idsToRemove, through[attrInIdsToRemove])
+        );
 
         if (entitiesToDelete.count() !== idsToRemove.length) {
-                    // Tried deleting non-existing entities.
+          // Tried deleting non-existing entities.
           const entitiesToDeleteIds = entitiesToDelete
-                        .toRefArray()
-                        .map(through => through[attrInIdsToRemove]);
+            .toRefArray()
+            .map(through => through[attrInIdsToRemove]);
 
           const unexistingIds = difference(idsToRemove, entitiesToDeleteIds);
 
           const toDeleteModel = reverse
-                        ? declaredFromModel.modelName
-                        : declaredToModel.modelName;
+            ? declaredFromModel.modelName
+            : declaredToModel.modelName;
 
           const deleteFromModel = reverse
-                        ? declaredToModel.modelName
-                        : declaredFromModel.modelName;
+            ? declaredToModel.modelName
+            : declaredFromModel.modelName;
 
           throw new Error(`Tried to delete non-existing ${toDeleteModel} id(s) ${unexistingIds} from the 
             ${deleteFromModel} instance with id ${thisId}`
@@ -209,10 +209,10 @@ function manyToManyDescriptor (
 const fieldToOneModelObjDescriptor = fieldToFkModelObjDescriptor;
 
 export {
-    attrDescriptor,
-    fieldToFkModelObjDescriptor,
-    fkModelObjToFieldDescriptor,
-    fieldToOneModelObjDescriptor,
-    oneModelObjToFieldDescriptor,
-    manyToManyDescriptor
+  attrDescriptor,
+  fieldToFkModelObjDescriptor,
+  fkModelObjToFieldDescriptor,
+  fieldToOneModelObjDescriptor,
+  oneModelObjToFieldDescriptor,
+  manyToManyDescriptor
 };

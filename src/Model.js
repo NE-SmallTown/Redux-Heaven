@@ -3,6 +3,8 @@
  *
  * Copyright (c) 2017
  */
+import warning from 'warning';
+import invariant from 'invariant';
 import forOwn from 'lodash/forOwn';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
@@ -19,7 +21,7 @@ import {
 } from './fields';
 import { CREATE, UPDATE, DELETE, FILTER } from './constants';
 import {
-  selectId,
+  normalizeEntity,
   arrayDiffActions,
   objectShallowEquals,
   m2mName
@@ -71,30 +73,6 @@ const Model = class Model {
 
   static toString () {
     return `ModelClass: ${this.modelName}`;
-  }
-
-  /**
-   * Returns the options object passed to the database for the table that represents
-   * this Model class.
-   *
-   * Returns an empty object by default, which means the database
-   * will use default options. You can either override this function to return the options
-   * you want to use, or assign the options object as a static property of the same name to the
-   * Model class.
-   *
-   * @return {Object} the options object passed to the database for the table
-   *                  representing this Model class.
-   */
-  static options () {
-    return {};
-  }
-
-  static _getTableOpts () {
-    if (typeof this.options === 'function') {
-      return this.options();
-    }
-
-    return this.options;
   }
 
   static get _sessionData () {
@@ -175,7 +153,7 @@ const Model = class Model {
       const values = relations[name];
 
       // TODO 替换成 lodash 的 values 函数
-      const normalizedNewIds = values.map(selectId);
+      const normalizedNewIds = values.map(normalizeEntity);
       const uniqueIds = uniq(normalizedNewIds);
 
       if (normalizedNewIds.length !== uniqueIds.length) {
@@ -219,59 +197,73 @@ const Model = class Model {
    * If you pass values for many-to-many fields, instances are created on the through
    * model as well.
    *
-   * @param  {props} userProps - the new {@link Model}'s properties.
+   * @param  {userProps} userProps - the new {@link Model}'s properties.
    * @return {Model} a new {@link Model} instance.
    */
   static create (userProps) {
-    const props = {...userProps};
-
+    const ret = { ...userProps };
     const m2mRelations = {};
 
-    const declaredVirtualFieldNames = Object.keys(this.virtualFields);
-
     Object.keys(this.fields).forEach(fieldKey => {
+      const userPropsHasFieldKey = userProps.hasOwnProperty(fieldKey);
+      if (!userPropsHasFieldKey) {
+        warning(
+          false,
+          `The Model ${this.modelName} has field key: ${fieldKey}, but the object which you pass doesn't have the key`
+        );
+      }
+
       const modelField = this.fields[fieldKey];
       const userPropsField = userProps[fieldKey];
-      const userPropsHasFieldKey = userProps.hasOwnProperty(fieldKey);
 
-      if (modelField instanceof ManyToMany && userPropsHasFieldKey) {
-        // If a value is supplied for a ManyToMany field,
-        // discard them from props and save for later processing.
+      // ManyToMany field 后面单独处理，先从最后的 ret 中移除
+      if (modelField instanceof ManyToMany) {
         m2mRelations[fieldKey] = userPropsField;
-        delete props[fieldKey];
+        delete ret[fieldKey];
 
         return;
       }
 
-      if (!(modelField instanceof ManyToMany)) {
+      if (modelField instanceof ForeignKey) {
         // 对于 ForeignKey，存储的不应是实体，而是实体的 id
         // 即 reply.author 不应该是一个对象，而应该是 author 的 id
-        // 而对于基础类型（即普通的 Attribute），存储的就是基本类型
-        props[fieldKey] = userPropsHasFieldKey ? selectId(userPropsField) : field.getDefault();
+        const userPropsFieldId = userPropsField[this.idAttribute];
+        invariant(
+          typeof userPropsFieldId === 'undefined',
+          `The ${fieldKey} in your object must have ${this.idAttribute} but passed in undefined`
+        );
+
+        ret[fieldKey] = userPropsFieldId;
+
+        // 然后还需要在 Author 表中去创建对象
+        this.session[modelField.fieldKeyInToMoel].create(userPropsField);
+      } else {
+        // 对于普通的 OneToOne（即 Atribute），直接存储其值
+        ret[fieldKey] = userPropsField;
       }
     });
 
     // add backward many-many if required
-    declaredVirtualFieldNames.forEach((key) => {
-      if (!m2mRelations.hasOwnProperty(key)) {
-        const field = this.virtualFields[key];
-        if (userProps.hasOwnProperty(key) && field instanceof ManyToMany) {
-          // If a value is supplied for a ManyToMany field,
-          // discard them from props and save for later processing.
-          m2mRelations[key] = userProps[key];
-          delete props[key];
+    Object.keys(this.virtualFields).forEach(virtualFieldKey => {
+      if (!m2mRelations.hasOwnProperty(virtualFieldKey) && userProps.hasOwnProperty(virtualFieldKey)) {
+        const field = this.virtualFields[virtualFieldKey];
+
+        if (field instanceof ManyToMany) {
+          m2mRelations[virtualFieldKey] = userProps[virtualFieldKey];
+          delete ret[virtualFieldKey];
         }
       }
     });
 
-    const newEntry = this.session.applyUpdate({
+    const newEntry = this.session.execute({
       action: CREATE,
       table: this.modelName,
-      payload: props
+      payload: ret
     });
 
     const ModelClass = this;
     const instance = new ModelClass(newEntry);
+    // 然后再把相关的属性加在中间表里面
     instance._refreshMany2Many(m2mRelations); // eslint-disable-line no-underscore-dangle
     return instance;
   }
@@ -282,7 +274,7 @@ const Model = class Model {
    * If you pass values for many-to-many fields, instances are created on the through
    * model as well.
    *
-   * @param  {props} userProps - the required {@link Model}'s properties.
+   * @param  {userProps} userProps - the required {@link Model}'s properties.
    * @return {Model} a {@link Model} instance.
    */
   static upsert (userProps) {
@@ -331,16 +323,16 @@ const Model = class Model {
   static _findDatabaseRows (lookupObj) {
     const ModelClass = this;
     return ModelClass
-    .session
-    .query({
-      table: ModelClass.modelName,
-      clauses: [
-        {
-          type: FILTER,
-          payload: lookupObj
-        }
-      ]
-    }).rows;
+      .session
+      .query({
+        table: ModelClass.modelName,
+        clauses: [
+          {
+            type: FILTER,
+            payload: lookupObj
+          }
+        ]
+      }).rows;
   }
 
   /**
@@ -528,18 +520,18 @@ const Model = class Model {
         // 还要在 fk 和 many 对应的 Model 里面 create 这个实例
         if (field instanceof ForeignKey || field instanceof OneToOne) {
           // update one-one/fk relations
-          mergeObj[mergeKey] = selectId(mergeObj[mergeKey]);
+          mergeObj[updatedKey] = normalizeEntity(mergeObj[updatedKey]);
         } else if (field instanceof ManyToMany) {
           // field is forward relation
-          m2mRelations[mergeKey] = mergeObj[mergeKey];
-          delete mergeObj[mergeKey];
+          m2mRelations[updatedKey] = mergeObj[updatedKey];
+          delete mergeObj[updatedKey];
         }
-      } else if (virtualFields.hasOwnProperty(mergeKey)) {
-        const field = virtualFields[mergeKey];
+      } else if (virtualFields.hasOwnProperty(updatedKey)) {
+        const field = virtualFields[updatedKey];
         if (field instanceof ManyToMany) {
           // field is backward relation
-          m2mRelations[mergeKey] = mergeObj[mergeKey];
-          delete mergeObj[mergeKey];
+          m2mRelations[updatedKey] = mergeObj[updatedKey];
+          delete mergeObj[updatedKey];
         }
       }
     }
@@ -573,7 +565,7 @@ const Model = class Model {
    */
   delete () {
     this._onDelete();
-    this.getClass().session.applyUpdate({
+    this.getClass().session.execute({
       action: DELETE,
       query: getByIdQuery(this)
     });
@@ -589,13 +581,13 @@ const Model = class Model {
       } else if (field instanceof ForeignKey) {
         const relatedQs = this[key];
         if (relatedQs.exists()) {
-          relatedQs.update({ [field.keyInToMoel]: null });
+          relatedQs.update({ [field.fieldKeyInToMoel]: null });
         }
       } else if (field instanceof OneToOne) {
         // Set null to any foreign keys or one to ones pointed to
         // this instance.
         if (this[key] !== null) {
-          this[key][field.keyInToMoel] = null;
+          this[key][field.fieldKeyInToMoel] = null;
         }
       }
     }

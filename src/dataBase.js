@@ -4,48 +4,81 @@
  * Copyright (c) 2017
  */
 
-import { CREATE, UPDATE, DELETE } from './constants';
+import invariant from 'invariant'
+import mapValues from 'lodash/mapValues'
+import ops from 'immutable-ops'
 
-let dataBaseState = {};
+import { QUERY, CREATE, UPDATE, DELETE } from './constants';
 
-function execute (executeSpec, tables, tx) {
+function replaceTableState(tableName, newTableState, tx, state) {
+  const { batchToken, withMutations } = tx;
+
+  if (withMutations) {
+    state[tableName] = newTableState;
+    return state;
+  }
+
+  return ops.batch.set(batchToken, tableName, newTableState, state);
+}
+
+function execute (tables, executeSpec, tx, state) {
   const { action, payload } = executeSpec;
 
-  let tableName;
+  const {table: tableName, query: querySpec, clauses} = updateSpec;
+  const table = tables[tableName];
+  const currTableState = state[tableName];
   let nextTableState;
   let resultPayload;
 
-  if (action === CREATE) {
-    ({ table: tableName } = updateSpec);
-    const table = tables[tableName];
-    const currTableState = state[tableName];
-    const result = table.insert(tx, currTableState, payload);
-    nextTableState = result.state;
-    resultPayload = result.created;
-  } else {
-    const { query: querySpec } = updateSpec;
-    ({ table: tableName } = querySpec);
-    const { rows } = query(tables, querySpec, state);
+  switch (action) {
+    case QUERY:
+      {
+        const rows = table.query(state[tableName], clauses);
 
-    const table = tables[tableName];
-    const currTableState = state[tableName];
+        return {
+          rows,
+        };
+      }
+    case CREATE:
+      {
+        table.insert(tx, currTableState, payload);
 
-    if (action === UPDATE) {
-      nextTableState = table.update(payload, tx);
-    } else if (action === DELETE) {
-      nextTableState = table.delete(rows, tx);
-    } else {
-      throw new Error(`Database received unknown update type: ${action}`);
-    }
+        nextTableState = table.state;
+        resultPayload = payload;
+
+        break;
+      }
+    case UPDATE:
+      {
+        nextTableState = table.update(payload, tx);
+
+        break;
+      }
+    case DELETE:
+      {
+        const { rows } = query(tables, querySpec, state);
+        nextTableState = table.delete(rows, tx);
+
+        break;
+      }
+    default:
+      invariant(false, `Database received unknown update type: ${action}`);
   }
+
+  const nextDBState = replaceTableState(tableName, nextTableState, tx, state);
+  return {
+    status: SUCCESS,
+    state: nextDBState,
+    payload: resultPayload,
+  };
 }
 
-export const createDataBase = tables => {
-  tables.forEach(table => {
-    dataBaseState[table.name] = table.state;
-  });
+export const createDatabase = schemaSpec => {
+  const { tables: tablesSpec } = schemaSpec;
+  const tables = mapValues(tablesSpec, tableSpec => new Table(tableSpec));
 
   return {
+    getState = () => mapValues(tables, table => table.state),
     createReducer: () => (state, action) => {
       return tables.reduce((ret, table) => {
         const tableClass = table.constructor;

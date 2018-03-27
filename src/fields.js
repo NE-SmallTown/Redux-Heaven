@@ -44,33 +44,33 @@ export class Attribute {
 class RelationalField {
   constructor (...args) {
     if (args.length === 1 && typeof args[0] === 'object') {
-      const { to, keyInToMoel, through, throughFields } = args[0];
+      const { to, fieldKeyInToMoel, through, throughFields } = args[0];
 
       this.toModelName = to;
-      this.keyInToMoel = keyInToMoel;
+      this.fieldKeyInToMoel = fieldKeyInToMoel;
       this.through = through;
       this.throughFields = throughFields;
     } else {
       this.toModelName = args[0];
-      this.keyInToMoel = args[1];
+      this.fieldKeyInToMoel = args[1];
     }
 
-    if (typeof this.toModelName === 'undefined' || typeof this.keyInToMoel === 'undefined') {
+    if (typeof this.toModelName === 'undefined' || typeof this.fieldKeyInToMoel === 'undefined') {
       const toModelName = this.toModelName;
-      const keyInToMoel = this.keyInToMoel;
+      const fieldKeyInToMoel = this.fieldKeyInToMoel;
 
       this.clearFields();
 
-      throw new Error(`When you use fk or many, you must provide 'to' and 'keyInToMoel'(when you pass an object
-        the function) or provide at least two arguments(arguments[0] for 'to', arguments[1] for 'keyInToMoel').
-        both of then can't be undefined, but now passed in to: ${toModelName}, keyInToMoel: ${keyInToMoel}`
+      throw new Error(`When you use fk or many, you must provide 'to' and 'fieldKeyInToMoel'(when you pass an object
+        the function) or provide at least two arguments(arguments[0] for 'to', arguments[1] for 'fieldKeyInToMoel').
+        both of then can't be undefined, but now passed in to: ${toModelName}, fieldKeyInToMoel: ${fieldKeyInToMoel}`
       );
     }
   }
 
   clearFields () {
     delete this.toModelName;
-    delete this.keyInToMoel;
+    delete this.fieldKeyInToMoel;
     delete this.through;
     delete this.toModelName;
   }
@@ -86,7 +86,7 @@ export class ForeignKey extends RelationalField {
     const toModel = toModelName === 'this' ? model : orm.get(toModelName);
 
     const nameOfFieldToFkModelObj = fieldName;
-    const nameOfFkModelObjToField = this.keyInToMoel;
+    const nameOfFkModelObjToField = this.fieldKeyInToMoel;
 
     // TODO 对于 fk 和 many，需要在 fk 和 many 对应的 Model 里面添加一个以 ids 结尾的 field
     // 比如 Book 的 author 是 fk('User', 'books')，那么需要在 User 里面加上一个 booksIds 用来代表 books 的 id 列表
@@ -182,12 +182,12 @@ export class ManyToMany extends RelationalField {
 
     model.virtualFields[fieldName] = new ManyToMany({
       to: toModel.modelName,
-      keyInToMoel: fieldName,
+      fieldKeyInToMoel: fieldName,
       through: this.through,
       throughFields
     });
 
-    const backwardsFieldName = this.keyInToMoel;
+    const backwardsFieldName = this.fieldKeyInToMoel;
 
     const backwardsDescriptor = Object.getOwnPropertyDescriptor(
       toModel.prototype,
@@ -218,7 +218,7 @@ export class ManyToMany extends RelationalField {
     );
     toModel.virtualFields[backwardsFieldName] = new ManyToMany({
       to: model.modelName,
-      keyInToMoel: fieldName,
+      fieldKeyInToMoel: fieldName,
       through: throughModelName,
       throughFields
     });
@@ -240,8 +240,8 @@ export class OneToOne extends RelationalField {
       fieldToOneModelObjDescriptor(fieldName, toModel.modelName)
     );
 
-    const backwardsFieldName = this.keyInToMoel
-      ? this.keyInToMoel
+    const backwardsFieldName = this.fieldKeyInToMoel
+      ? this.fieldKeyInToMoel
       : model.modelName.toLowerCase();
 
     const backwardsDescriptor = Object.getOwnPropertyDescriptor(
@@ -317,7 +317,7 @@ export function attr (opts) {
  *
  * ```javascript
  * fields = {
- *   author: fk({ to: 'Author', keyInToMoel: 'books' })
+ *   author: fk({ to: 'Author', fieldKeyInToMoel: 'books' })
  * }
  * ```
  *
@@ -332,8 +332,8 @@ export function attr (opts) {
  * @param  {string|boolean} toModelNameOrObj - the `modelName` property of
  *                                           the Model that is the target of the
  *                                           foreign key, or an object with properties
- *                                           `to` and optionally `keyInToMoel`.
- * @param {string} [keyInToMoel] - if you didn't pass an object as the first argument,
+ *                                           `to` and optionally `fieldKeyInToMoel`.
+ * @param {string} [fieldKeyInToMoel] - if you didn't pass an object as the first argument,
  *                                 this is the property name that will be used to
  *                                 access a QuerySet the foreign key is defined from,
  *                                 from the target model.
@@ -375,7 +375,7 @@ export function fk (...args) {
  * Author.fields = {
  *   books: many({
  *     to: 'Book',
- *     keyInToMoel: 'authors',
+ *     fieldKeyInToMoel: 'authors',
  *     through: 'Authorship',
  *
  *     // this is optional, since Redux-ORM can figure
@@ -409,7 +409,7 @@ export function fk (...args) {
  *                                            relationship with. The order doesn't matter;
  *                                            Redux-ORM will figure out which field points to
  *                                            the source Model and which to the target Model.
- * @param  {string} [options.keyInToMoel] - the attribute used to access a QuerySet
+ * @param  {string} [options.fieldKeyInToMoel] - the attribute used to access a QuerySet
  *                                          of source Models from target Model.
  * @return {ManyToMany}
  */
@@ -421,14 +421,14 @@ export function many (...args) {
  * Defines a one-to-one relationship. In database terms, this is a foreign key with the
  * added restriction that only one entity can point to single target entity.
  *
- * The arguments are the same as with `fk`. If `keyInToMoel` is not supplied,
+ * The arguments are the same as with `fk`. If `fieldKeyInToMoel` is not supplied,
  * the source model name in lowercase will be used. Note that with the one-to-one
- * relationship, the `keyInToMoel` should be in singular, not plural.
+ * relationship, the `fieldKeyInToMoel` should be in singular, not plural.
  * @param  {string|boolean} toModelNameOrObj - the `modelName` property of
  *                                           the Model that is the target of the
  *                                           foreign key, or an object with properties
- *                                           `to` and optionally `keyInToMoel`.
- * @param {string} [keyInToMoel] - if you didn't pass an object as the first argument,
+ *                                           `to` and optionally `fieldKeyInToMoel`.
+ * @param {string} [fieldKeyInToMoel] - if you didn't pass an object as the first argument,
  *                                 this is the property name that will be used to
  *                                 access a Model the foreign key is defined from,
  *                                 from the target Model.

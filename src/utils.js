@@ -121,14 +121,13 @@ function attachQuerySetMethods (modelClass, querySetClass) {
  * @param  {*} entity - either a Model instance or an id value
  * @return {*} the id value of `entity`
  */
-function selectId (entity) {
-  if (entity !== null &&
-    typeof entity !== 'undefined' &&
-    typeof entity.getId === 'function') {
+const normalizeEntity = entity => {
+  if (entity != null && typeof entity.getId === 'function') {
     return entity.getId();
   }
+
   return entity;
-}
+};
 
 function reverseFieldErrorMessage (modelName, fieldName, toModelName, backwardsFieldName) {
   return [`Reverse field ${backwardsFieldName} already defined`,
@@ -171,7 +170,7 @@ export {
   m2mName,
   m2mFromFieldName,
   m2mToFieldName,
-  selectId,
+  normalizeEntity,
   reverseFieldErrorMessage,
   objectShallowEquals,
   ops,

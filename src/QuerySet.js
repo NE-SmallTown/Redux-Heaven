@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues';
 import {
-  selectId,
+  normalizeEntity,
   warnDeprecated
 } from './utils';
 
@@ -163,7 +163,7 @@ const QuerySet = class QuerySet {
    */
   filter (lookupObj) {
     const normalizedLookupObj = typeof lookupObj === 'object'
-      ? mapValues(lookupObj, selectId)
+      ? mapValues(lookupObj, normalizeEntity)
       : lookupObj;
     const filterDescriptor = { type: FILTER, payload: normalizedLookupObj };
     return this._new(this.clauses.concat(filterDescriptor));
@@ -178,7 +178,7 @@ const QuerySet = class QuerySet {
    */
   exclude (lookupObj) {
     const normalizedLookupObj = typeof lookupObj === 'object'
-      ? mapValues(lookupObj, selectId)
+      ? mapValues(lookupObj, normalizeEntity)
       : lookupObj;
     const excludeDescriptor = { type: EXCLUDE, payload: normalizedLookupObj };
     return this._new(this.clauses.concat(excludeDescriptor));
@@ -226,7 +226,7 @@ const QuerySet = class QuerySet {
    * @return {undefined}
    */
   update (mergeObj) {
-    this.modelClass.session.applyUpdate({
+    this.modelClass.session.execute({
       action: UPDATE,
       query: {
         table: this.modelClass.modelName,
@@ -245,7 +245,7 @@ const QuerySet = class QuerySet {
     // eslint-disable-next-line no-underscore-dangle
     this.toModelArray().forEach(model => model._onDelete());
 
-    this.modelClass.session.applyUpdate({
+    this.modelClass.session.execute({
       action: DELETE,
       query: {
         table: this.modelClass.modelName,
