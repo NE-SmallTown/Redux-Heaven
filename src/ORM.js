@@ -24,7 +24,7 @@ import {
 } from './utils';
 
 const ORM_DEFAULTS = {
-  createDatabase: defaultcreateDatabase,
+  createDatabase: defaultcreateDatabase
 };
 
 /**

@@ -17,7 +17,7 @@
     "js",
     "json"
   ],
-  "testRegex": "src/test/test(.*)\\.js",
+  "testRegex": "src/tests/.*test.js",
   "transform": {
     "\\.js$": "./node_modules/babel-jest"
   }

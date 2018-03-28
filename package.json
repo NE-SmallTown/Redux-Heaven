@@ -21,7 +21,7 @@
   "scripts": {
     "clean": "rimraf ./lib",
     "prebuild": "npm run clean",
-    "build": "./node_modules/.bin/babel src --out-dir lib --ignore src/examples && node ./bin/build",
+    "build": "./node_modules/.bin/babel src --out-dir lib --ignore src/examples && webpack && webpack --mode=buil",
     "flow": "flow",
     "lint": "eslint src tests",
     "lint:fix": "npm run lint -- --fix",
@@ -31,7 +31,7 @@
   },
   "betterScripts": {
     "test": {
-      "command": "jest --config=./config/jest.config.json --coverage",
+      "command": "jest --config=jest.conf.json --coverage",
       "env": {
         "NODE_ENV": "test",
         "DEBUG": "app:*"
