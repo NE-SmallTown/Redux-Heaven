@@ -29,15 +29,6 @@
     "test:dev": "npm run test -- --watch",
     "codecov": "cat coverage/*/lcov.info | codecov"
   },
-  "betterScripts": {
-    "test": {
-      "command": "jest --config=jest.conf.json --coverage",
-      "env": {
-        "NODE_ENV": "test",
-        "DEBUG": "app:*"
-      }
-    }
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/NE-SmallTown/redux-Heaven.git"

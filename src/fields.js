@@ -82,8 +82,7 @@ class RelationalField {
 
 export class ForeignKey extends RelationalField {
   install (model, fieldName, orm) {
-    const toModelName = this.toModelName;
-    const toModel = toModelName === 'this' ? model : orm.get(toModelName);
+    const toModel = orm.get(this.toModelName);
 
     const nameOfFieldToFkModelObj = fieldName;
     const nameOfFkModelObjToField = this.fieldKeyInToMoel;
@@ -125,8 +124,7 @@ export class ForeignKey extends RelationalField {
 
 export class ManyToMany extends RelationalField {
   install (model, fieldName, orm) {
-    const toModelName = this.toModelName;
-    const toModel = toModelName === 'this' ? model : orm.get(toModelName);
+    const toModel = orm.get(this.toModelName);
 
     const throughModelName =
       this.through ||
@@ -231,8 +229,7 @@ export class ManyToMany extends RelationalField {
 
 export class OneToOne extends RelationalField {
   install (model, fieldName, orm) {
-    const toModelName = this.toModelName;
-    const toModel = toModelName === 'this' ? model : orm.get(toModelName);
+    const toModel = orm.get(this.toModelName);
 
     Object.defineProperty(
       model.prototype,

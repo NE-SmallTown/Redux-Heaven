@@ -14,11 +14,10 @@
     }
   },
   "moduleFileExtensions": [
-    "js",
-    "json"
+    "js"
   ],
   "testRegex": "src/tests/.*test.js",
   "transform": {
-    "\\.js$": "./node_modules/babel-jest"
+    ".*.js": "./node_modules/babel-jest"
   }
 }

@@ -44,8 +44,8 @@ export const ORM = class ORM {
   /**
      * Creates a new ORM instance.
      */
-  constructor (opts) {
-    const { createDatabase } = Object.assign({}, ORM_DEFAULTS, (opts || {}));
+  constructor (opts = {}) {
+    const { createDatabase } = {...ORM_DEFAULTS, ...opts};
     this.createDatabase = createDatabase;
     this.registry = [];
     this.implicitThroughModels = [];
@@ -64,7 +64,7 @@ export const ORM = class ORM {
      */
   register (...models) {
     models.forEach((model) => {
-      model.invalidateClassCache();
+      model.resetClassCache();
 
       this.registerManyToManyModelsFor(model);
       this.registry.push(model);
@@ -77,27 +77,20 @@ export const ORM = class ORM {
 
     forOwn(fields, (fieldInstance, fieldName) => {
       if (fieldInstance instanceof ManyToMany && !fieldInstance.through) {
-        let toModelName;
-        if (fieldInstance.toModelName === 'this') {
-          toModelName = thisModelName;
-        } else {
-          toModelName = fieldInstance.toModelName;
-        }
+        const toModelName = fieldInstance.toModelName;
 
-        const fromFieldName = m2mFromFieldName(thisModelName);
-        const toFieldName = m2mToFieldName(toModelName);
+        // TODO 感觉可以完全消除中间表
+        class ThroughModel extends Model {
+          static modelName = m2mName(thisModelName, fieldName)
 
-        const Through = class ThroughModel extends Model {};
-
-        Through.modelName = m2mName(thisModelName, fieldName);
-
-        Through.fields = {
-          id: attr(),
-          [fromFieldName]: new ForeignKey(thisModelName),
-          [toFieldName]: new ForeignKey(toModelName)
+          static fields = {
+            id: attr(),
+            [m2mFromFieldName(thisModelName)]: new ForeignKey(thisModelName),
+            [m2mToFieldName(toModelName)]: new ForeignKey(toModelName)
+          }
         };
 
-        Through.invalidateClassCache();
+        ThroughModel.resetClassCache();
         this.implicitThroughModels.push(Through);
       }
     });
@@ -124,6 +117,7 @@ export const ORM = class ORM {
   getModelClasses () {
     this._setupModelPrototypes(this.registry);
     this._setupModelPrototypes(this.implicitThroughModels);
+
     return this.registry.concat(this.implicitThroughModels);
   }
 
@@ -169,6 +163,7 @@ export const ORM = class ORM {
       spec[tableName] = Object.assign({}, { fields: modelClass.fields }, tableSpec);
       return spec;
     }, {});
+
     return { tables };
   }
 

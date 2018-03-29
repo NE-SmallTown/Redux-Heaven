@@ -1,11 +1,11 @@
 {
   "plugins": [
+    "transform-class-properties syntax-class-properties",
     "transform-decorators-legacy",
     "transform-object-rest-spread",
-    "transform-export-extensions",
-    "transform-class-properties"
+    "transform-export-extensions"
   ],
-  "presets": [["env", {"modules": false}], "react", "stage-0"],
+  "presets": [["env", {"modules": false}], "react"],
   "env": {
     "test": {
       "presets": [["env"], "react"]

@@ -121,7 +121,7 @@ const Model = class Model {
     return new QuerySet(this);
   }
 
-  static invalidateClassCache () {
+  static resetClassCache () {
     this.isSetUp = undefined;
     this.virtualFields = {};
   }
@@ -204,8 +204,10 @@ const Model = class Model {
     const ret = { ...userProps };
     const m2mRelations = {};
 
-    Object.keys(this.fields).forEach(fieldKey => {
+    forOwn(this.fields, (modelField, fieldKey) => {
       const userPropsHasFieldKey = userProps.hasOwnProperty(fieldKey);
+      // 可以多传在 schema 里没有的 field，但是不能少传
+      // TODO 应该是可以少传的，因为 schema 应该只是最大的集合而已
       if (!userPropsHasFieldKey) {
         warning(
           false,
@@ -213,10 +215,9 @@ const Model = class Model {
         );
       }
 
-      const modelField = this.fields[fieldKey];
       const userPropsField = userProps[fieldKey];
 
-      // ManyToMany field 后面单独处理，先从最后的 ret 中移除
+      // ManyToMany field 在后面单独处理，所以这里先从最后的 ret 中移除
       if (modelField instanceof ManyToMany) {
         m2mRelations[fieldKey] = userPropsField;
         delete ret[fieldKey];
@@ -224,19 +225,24 @@ const Model = class Model {
         return;
       }
 
+      // 对于 ForeignKey，存储的不应是实体，而应是实体的 id
+      // 比如 reply.author 不应该是一个 User 结构的对象，而应该是 User 的 id
       if (modelField instanceof ForeignKey) {
-        // 对于 ForeignKey，存储的不应是实体，而是实体的 id
-        // 即 reply.author 不应该是一个对象，而应该是 author 的 id
-        const userPropsFieldId = userPropsField[this.idAttribute];
+        const userPropsFieldId = userPropsField[modelField.constructor.idAttribute];
         invariant(
           typeof userPropsFieldId === 'undefined',
-          `The ${fieldKey} in your object must have ${this.idAttribute} but passed in undefined`
+          `The ${fieldKey} in your object must have ${modelField.constructor.idAttribute} but passed in undefined`
         );
 
         ret[fieldKey] = userPropsFieldId;
 
-        // 然后还需要在 Author 表中去创建对象
+        // 然后还需要在 User 表中去创建对象
         this.session[modelField.fieldKeyInToMoel].create(userPropsField);
+      } else if (typeof modelField === 'object') {
+        invariant(
+          false,
+          'field must be instance of ManyToMany/ForeignKey/OneToOne, but passed in an normal object/array'
+        );
       } else {
         // 对于普通的 OneToOne（即 Atribute），直接存储其值
         ret[fieldKey] = userPropsField;

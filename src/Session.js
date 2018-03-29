@@ -21,8 +21,8 @@ const Session = class Session {
    * @param  {Object} [batchToken] - used by the backend to identify objects that can be
    *                                 mutated.
    */
-  constructor (schema, db, state, withMutations, batchToken) {
-    this.schema = schema;
+  constructor (orm, db, state, withMutations, batchToken) {
+    this.orm = orm;
     this.db = db;
     this.state = state || db.getState();
     this.initialState = this.state;
@@ -33,10 +33,11 @@ const Session = class Session {
     this._accessedModels = {};
     this.modelData = {};
 
-    this.models = schema.getModelClasses();
+    this.models = orm.getModelClasses();
 
     this.sessionBoundModels = this.models.map((modelClass) => {
       const sessionBoundModel = class SessionBoundModel extends modelClass {};
+
       Object.defineProperty(this, modelClass.modelName, {
         get: () => sessionBoundModel
       });
