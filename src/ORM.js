@@ -65,6 +65,7 @@ export const ORM = class ORM {
   register (...models) {
     models.forEach((model) => {
       model.resetClassCache();
+      model.setOrm(this);
 
       this.registerManyToManyModelsFor(model);
       this.registry.push(model);
@@ -121,11 +122,6 @@ export const ORM = class ORM {
     return this.registry.concat(this.implicitThroughModels);
   }
 
-  _attachQuerySetMethods (model) {
-    const { querySetClass } = model;
-    attachQuerySetMethods(model, querySetClass);
-  }
-
   isFieldInstalled (modelName, fieldName) {
     return this.installedFields.hasOwnProperty(modelName)
       ? !!this.installedFields[modelName][fieldName]
@@ -140,16 +136,19 @@ export const ORM = class ORM {
   }
 
   _setupModelPrototypes (models) {
+    // models 即调用 model.registry 注册的所有 model
     models.forEach((model) => {
       if (!model.isSetUp) {
         const fields = model.fields;
         forOwn(fields, (fieldInstance, fieldName) => {
           if (!this.isFieldInstalled(model.modelName, fieldName)) {
-            fieldInstance.install(model, fieldName, this);
-            this.setFieldInstalled(model.modelName, fieldName);
+            if (!fieldInstance.lazy) {
+                fieldInstance.install(model, fieldName, this);
+                this.setFieldInstalled(model.modelName, fieldName);
+            }
           }
         });
-        this._attachQuerySetMethods(model);
+        attachQuerySetMethods(model, model.querySetClass);
         model.isSetUp = true;
       }
     });

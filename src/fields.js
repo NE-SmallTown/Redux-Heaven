@@ -5,6 +5,9 @@
  */
 
 import findKey from 'lodash/findKey';
+import isPlainObject from 'lodash/isPlainObject';
+import isFunction from 'lodash/isFunction';
+import memoize from 'lodash/memoize'
 
 import {
   attrDescriptor,
@@ -32,7 +35,7 @@ export class Attribute {
     }
   }
 
-  install (model, fieldName, orm) {
+  install (model, fieldName) {
     Object.defineProperty(
       model.prototype,
       fieldName,
@@ -43,7 +46,9 @@ export class Attribute {
 
 class RelationalField {
   constructor (...args) {
-    if (args.length === 1 && typeof args[0] === 'object') {
+    this.lazy = false;
+
+    if (args.length === 1 && isPlainObject(args[0])) {
       const { to, fieldKeyInToMoel, through, throughFields } = args[0];
 
       this.toModelName = to;
@@ -51,7 +56,26 @@ class RelationalField {
       this.through = through;
       this.throughFields = throughFields;
     } else {
-      this.toModelName = args[0];
+      // fk 的参数还可以是函数
+      // Demo:
+      // fk(
+      // ({type}) => {
+      // switch (type) {
+      //   case 'question':
+      //     return ['Question', 'userRecommandQuestions'];
+      //   case 'question-answer':
+      //       return ['QAnswer', 'userRecommandQuestionsAndAnswers'];
+      //   case 'Topic':
+      //       return ['Topic', 'userRecommandTopics'];
+      // }
+      // }
+      if (isFunction(args[0])) {
+        // 告诉 ORM，遇到这个 field 需要运行时再 install
+        this.lazy = true;
+      }
+
+      // this.toModelName = memoize(args[0]); // 是对象，不好缓存，但是也不好只传 type
+        this.toModelName = args[0];
       this.fieldKeyInToMoel = args[1];
     }
 
@@ -81,11 +105,14 @@ class RelationalField {
 }
 
 export class ForeignKey extends RelationalField {
+  // 调用方式为：fieldInstance.install(model, fieldName, ormInstance)
+  // fieldName 为 model 的某个 field 的 key
   install (model, fieldName, orm) {
     const toModel = orm.get(this.toModelName);
 
-    const nameOfFieldToFkModelObj = fieldName;
-    const nameOfFkModelObjToField = this.fieldKeyInToMoel;
+    // ex: Model fields 里面有：author: fk('User', 'books')
+    const nameOfFieldToFkModelObj = fieldName; // fieldName = 'author'
+    const nameOfFkModelObjToField = this.fieldKeyInToMoel; // fieldKeyInToMoel = 'books'
 
     // TODO 对于 fk 和 many，需要在 fk 和 many 对应的 Model 里面添加一个以 ids 结尾的 field
     // 比如 Book 的 author 是 fk('User', 'books')，那么需要在 User 里面加上一个 booksIds 用来代表 books 的 id 列表

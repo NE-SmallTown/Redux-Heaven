@@ -34,7 +34,8 @@ const getOperationPriority = ({ type, payload }) => {
 };
 
 const DEFAULT_TABLE_ATTRIBUTES = {
-  idAttribute: 'id'
+  idAttribute: 'id',
+  candidateIdKes: ['id'] // 这些里面的都有可能是 id，如 ['user_id', 'user_id', 'author_id'] 最终都会转化为 id 存储在 table 上
 };
 
 // TODO 数据库操作目前都使用的同步带 Promise，目的是为了将来可能的异步扩展

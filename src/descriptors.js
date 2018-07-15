@@ -29,8 +29,6 @@ function fieldToFkModelObjDescriptor (fieldName, declaredToModelName) {
       if (typeof toId !== 'undefined' && toId !== null) {
         return declaredToModel.withId(toId);
       }
-
-      return;
     },
     set (value) {
       const currentSession = this.getClass().session;

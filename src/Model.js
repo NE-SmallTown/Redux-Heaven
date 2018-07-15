@@ -24,7 +24,8 @@ import {
   normalizeEntity,
   arrayDiffActions,
   objectShallowEquals,
-  m2mName
+  m2mName,
+  putCandidateIdKeyIntoObject
 } from './utils';
 
 // Generates a query specification
@@ -91,6 +92,10 @@ const Model = class Model {
    */
   static get idAttribute () {
     return this.session.db.describe(this.modelName).idAttribute;
+  }
+
+  static get candidateIdKes () {
+      return this.session.db.describe(this.modelName).candidateIdKes;
   }
 
   /**
@@ -191,6 +196,9 @@ const Model = class Model {
     });
   }
 
+
+
+
   /**
    * Creates a new record in the database, instantiates a {@link Model} and returns it.
    *
@@ -204,48 +212,63 @@ const Model = class Model {
     const ret = { ...userProps };
     const m2mRelations = {};
 
-    forOwn(this.fields, (modelField, fieldKey) => {
-      const userPropsHasFieldKey = userProps.hasOwnProperty(fieldKey);
+    // 没有 idAttribute 对应的字段时，需要将 candidateIdKes 中的转移到 idAttribute 上
+    // 总之就是确保 model 上有 idAttribute 对应的字段，后面的查删改都直接以 idAttribute 为准就行了
+    putCandidateIdKeyIntoObject(ret, this.idAttribute, this.candidateIdKes);
+
+    forOwn(this.fields, (fieldInstance, fieldName) => {
+      const userPropsHasFieldKey = userProps.hasOwnProperty(fieldName);
       // 可以多传在 schema 里没有的 field，但是不能少传
       // TODO 应该是可以少传的，因为 schema 应该只是最大的集合而已
       if (!userPropsHasFieldKey) {
         warning(
           false,
-          `The Model ${this.modelName} has field key: ${fieldKey}, but the object which you pass doesn't have the key`
+          `The Model ${this.modelName} has field key: ${fieldName}, but the object which you pass doesn't have the key`
         );
       }
 
-      const userPropsField = userProps[fieldKey];
+      const userPropsField = userProps[fieldName];
 
       // ManyToMany field 在后面单独处理，所以这里先从最后的 ret 中移除
-      if (modelField instanceof ManyToMany) {
-        m2mRelations[fieldKey] = userPropsField;
-        delete ret[fieldKey];
+      if (fieldInstance instanceof ManyToMany) {
+        m2mRelations[fieldName] = userPropsField;
+        delete ret[fieldName];
 
         return;
       }
 
       // 对于 ForeignKey，存储的不应是实体，而应是实体的 id
       // 比如 reply.author 不应该是一个 User 结构的对象，而应该是 User 的 id
-      if (modelField instanceof ForeignKey) {
-        const userPropsFieldId = userPropsField[modelField.constructor.idAttribute];
+      if (fieldInstance instanceof ForeignKey) {
+        const toModelName = fieldInstance.toModelName(userProps);
+        const modelClass = this.orm.get(toModelName);
+
+        if (fieldInstance.lazy === undefined) {
+          throw Error(`modelInstance.lazy can't be undefined, please file an issue!`)
+        } else {
+            fieldInstance.install(modelClass, fieldName, this.orm)
+        }
+
+        putCandidateIdKeyIntoObject(userPropsField, modelClass.idAttribute, modelClass.candidateIdKes);
+
+        const userPropsFieldId = userPropsField[modelClass.idAttribute];
         invariant(
           typeof userPropsFieldId === 'undefined',
-          `The ${fieldKey} in your object must have ${modelField.constructor.idAttribute} but passed in undefined`
+          `The ${fieldName} in your object must have ${modelClass.idAttribute} but passed in undefined`
         );
 
-        ret[fieldKey] = userPropsFieldId;
+        ret[fieldName] = userPropsFieldId;
 
         // 然后还需要在 User 表中去创建对象
-        this.session[modelField.fieldKeyInToMoel].create(userPropsField);
-      } else if (typeof modelField === 'object') {
+        this.session[fieldInstance.fieldKeyInToMoel].create(userPropsField);
+      } else if (typeof fieldInstance === 'object') {
         invariant(
           false,
           'field must be instance of ManyToMany/ForeignKey/OneToOne, but passed in an normal object/array'
         );
       } else {
         // 对于普通的 OneToOne（即 Atribute），直接存储其值
-        ret[fieldKey] = userPropsField;
+        ret[fieldName] = userPropsField;
       }
     });
 
@@ -372,6 +395,10 @@ const Model = class Model {
    */
   getClass () {
     return this.constructor;
+  }
+  
+  setOrm (orm) {
+    this.orm = orm;
   }
 
   /**

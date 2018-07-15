@@ -163,6 +163,17 @@ function arrayDiffActions (sourceArr, targetArr) {
   return null;
 }
 
+function putCandidateIdKeyIntoObject (obj, idAttribute, candidateIdKes) {
+  if (!obj[idAttribute]) {
+    for (const key of candidateIdKes) {
+      if (obj[key]) {
+          obj[idAttribute] = obj[key]
+          break
+      }
+    }
+  }
+}
+
 const { getBatchToken } = ops;
 
 export {
@@ -176,5 +187,6 @@ export {
   ops,
   includes,
   arrayDiffActions,
+  putCandidateIdKeyIntoObject,
   getBatchToken
 };
