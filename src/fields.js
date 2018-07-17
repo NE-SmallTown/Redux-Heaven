@@ -7,7 +7,6 @@
 import findKey from 'lodash/findKey';
 import isPlainObject from 'lodash/isPlainObject';
 import isFunction from 'lodash/isFunction';
-import memoize from 'lodash/memoize'
 
 import {
   attrDescriptor,
@@ -75,7 +74,7 @@ class RelationalField {
       }
 
       // this.toModelName = memoize(args[0]); // 是对象，不好缓存，但是也不好只传 type
-        this.toModelName = args[0];
+      this.toModelName = args[0];
       this.fieldKeyInToMoel = args[1];
     }
 
@@ -110,7 +109,7 @@ export class ForeignKey extends RelationalField {
   install (model, fieldName, orm) {
     const toModel = orm.get(this.toModelName);
 
-    // ex: Model fields 里面有：author: fk('User', 'books')
+    // 比如 Model fields 里面有：{ author: fk('User', 'books') }
     const nameOfFieldToFkModelObj = fieldName; // fieldName = 'author'
     const nameOfFkModelObjToField = this.fieldKeyInToMoel; // fieldKeyInToMoel = 'books'
 
@@ -149,35 +148,15 @@ export class ForeignKey extends RelationalField {
   }
 }
 
+// through 即中间表
 export class ManyToMany extends RelationalField {
   install (model, fieldName, orm) {
     const toModel = orm.get(this.toModelName);
-
-    const throughModelName =
-      this.through ||
-      m2mName(model.modelName, fieldName);
-
+    const throughModelName = this.through || m2mName(model.modelName, fieldName);
     const throughModel = orm.get(throughModelName);
 
     let throughFields;
-    if (!this.throughFields) {
-      const toFieldName = findKey(
-        throughModel.fields,
-        field =>
-          field instanceof ForeignKey &&
-          field.toModelName === toModel.modelName
-      );
-      const fromFieldName = findKey(
-        throughModel.fields,
-        field =>
-          field instanceof ForeignKey &&
-          field.toModelName === model.modelName
-      );
-      throughFields = {
-        to: toFieldName,
-        from: fromFieldName
-      };
-    } else {
+    if (this.throughFields) {
       const [fieldAName, fieldBName] = this.throughFields;
       const fieldA = throughModel.fields[fieldAName];
       if (fieldA.toModelName === toModel.modelName) {
@@ -191,11 +170,25 @@ export class ManyToMany extends RelationalField {
           from: fieldAName
         };
       }
+    } else {
+      const toFieldName = findKey(
+        throughModel.fields,
+        field => field instanceof ForeignKey && field.toModelName === toModel.modelName // toModel.modelName: 'User'
+      );
+      const fromFieldName = findKey(
+        throughModel.fields,
+        field => field instanceof ForeignKey && field.toModelName === model.modelName // model.modelName: 'Article'
+      );
+      
+      throughFields = {
+        from: fromFieldName,
+        to: toFieldName
+      };
     }
 
     Object.defineProperty(
-      model.prototype,
-      fieldName,
+      model.prototype, // Article
+      fieldName, // authors
       manyToManyDescriptor(
         model.modelName,
         toModel.modelName,
@@ -317,9 +310,7 @@ export class OneToOne extends RelationalField {
  *                                       value is not passed.
  * @return {Attribute}
  */
-export function attr (opts) {
-  return new Attribute(opts);
-}
+export const attr = (opts) => new Attribute(opts);
 
 /**
  * Defines a foreign key on a model, which points
@@ -363,9 +354,7 @@ export function attr (opts) {
  *                                 from the target model.
  * @return {ForeignKey}
  */
-export function fk (...args) {
-  return new ForeignKey(...args);
-}
+export const fk = (...args) => new ForeignKey(...args);
 
 /**
  * Defines a many-to-many relationship between
@@ -437,9 +426,7 @@ export function fk (...args) {
  *                                          of source Models from target Model.
  * @return {ManyToMany}
  */
-export function many (...args) {
-  return new ManyToMany(...args);
-}
+export const many = (...args) => new ManyToMany(...args);
 
 /**
  * Defines a one-to-one relationship. In database terms, this is a foreign key with the
@@ -458,6 +445,5 @@ export function many (...args) {
  *                                 from the target Model.
  * @return {OneToOne}
  */
-export function oneToOne (...args) {
-  return new OneToOne(...args);
-}
+export const oneToOne = (...args) => new OneToOne(...args);
+

@@ -82,14 +82,14 @@ export const ORM = class ORM {
 
         // TODO 感觉可以完全消除中间表
         class ThroughModel extends Model {
-          static modelName = m2mName(thisModelName, fieldName)
+          static modelName = m2mName(thisModelName, fieldName);
 
           static fields = {
             id: attr(),
-            [m2mFromFieldName(thisModelName)]: new ForeignKey(thisModelName),
-            [m2mToFieldName(toModelName)]: new ForeignKey(toModelName)
+            [m2mFromFieldName(thisModelName)]: new ForeignKey(thisModelName), // 如 'fromArticleId'
+            [m2mToFieldName(toModelName)]: new ForeignKey(toModelName) // 如 'toUserId'
           }
-        };
+        }
 
         ThroughModel.resetClassCache();
         this.implicitThroughModels.push(Through);

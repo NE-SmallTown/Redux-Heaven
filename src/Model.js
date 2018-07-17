@@ -48,6 +48,84 @@ function getByIdQuery (modelInstance) {
 
 // Table 作为底层抽象，确实不适合将 Model 的逻辑混合在里面，故还是延续了 redux-orm 将 Model 拆出来的方式
 const Model = class Model {
+  static fields = {
+    id: attr()
+  };
+  
+  static virtualFields = {};
+  
+  
+  static toString () {
+    return `ModelClass: ${this.modelName}`;
+  }
+  
+  static get _sessionData () {
+    if (!this.session) return {};
+    return this.session.getDataForModel(this.modelName);
+  }
+  
+  static markAccessed () {
+    this.session.markAccessed(this);
+  }
+  
+  /**
+   * Returns the id attribute of this {@link Model}.
+   *
+   * @return {string} The id attribute of this {@link Model}.
+   */
+  static get idAttribute () {
+    return this.session.db.describe(this.modelName).idAttribute;
+  }
+  
+  static get candidateIdKes () {
+    return this.session.db.describe(this.modelName).candidateIdKes;
+  }
+  
+  /**
+   * Connect the model class to a {@link Session}.
+   *
+   * @private
+   * @param  {Session} session - The session to connect to.
+   */
+  static connect (session) {
+    if (!(session instanceof Session)) {
+      throw Error('A model can only connect to a Session instance.');
+    }
+    
+    this._session = session;
+  }
+  
+  /**
+   * Get the current {@link Session} instance.
+   *
+   * @private
+   * @return {Session} The current {@link Session} instance.
+   */
+  static get session () {
+    return this._session;
+  }
+  
+  static getQuerySet () {
+    return new QuerySet(this);
+  }
+  
+  static resetClassCache () {
+    this.isSetUp = undefined;
+    this.virtualFields = {};
+  }
+  
+  static get query () {
+    return this.getQuerySet();
+  }
+  
+  /**
+   * Returns a {@link QuerySet} containing all {@link Model} instances.
+   * @return {QuerySet} a QuerySet containing all {@link Model} instances
+   */
+  static all () {
+    return this.getQuerySet();
+  }
+  
   constructor (fields) {
     this.initFields(fields);
   }
@@ -70,77 +148,6 @@ const Model = class Model {
         });
       }
     });
-  }
-
-  static toString () {
-    return `ModelClass: ${this.modelName}`;
-  }
-
-  static get _sessionData () {
-    if (!this.session) return {};
-    return this.session.getDataForModel(this.modelName);
-  }
-
-  static markAccessed () {
-    this.session.markAccessed(this);
-  }
-
-  /**
-   * Returns the id attribute of this {@link Model}.
-   *
-   * @return {string} The id attribute of this {@link Model}.
-   */
-  static get idAttribute () {
-    return this.session.db.describe(this.modelName).idAttribute;
-  }
-
-  static get candidateIdKes () {
-      return this.session.db.describe(this.modelName).candidateIdKes;
-  }
-
-  /**
-   * Connect the model class to a {@link Session}.
-   *
-   * @private
-   * @param  {Session} session - The session to connect to.
-   */
-  static connect (session) {
-    if (!(session instanceof Session)) {
-      throw Error('A model can only connect to a Session instance.');
-    }
-
-    this._session = session;
-  }
-
-  /**
-   * Get the current {@link Session} instance.
-   *
-   * @private
-   * @return {Session} The current {@link Session} instance.
-   */
-  static get session () {
-    return this._session;
-  }
-
-  static getQuerySet () {
-    return new QuerySet(this);
-  }
-
-  static resetClassCache () {
-    this.isSetUp = undefined;
-    this.virtualFields = {};
-  }
-
-  static get query () {
-    return this.getQuerySet();
-  }
-
-  /**
-   * Returns a {@link QuerySet} containing all {@link Model} instances.
-   * @return {QuerySet} a QuerySet containing all {@link Model} instances
-   */
-  static all () {
-    return this.getQuerySet();
   }
 
   /**
@@ -196,9 +203,6 @@ const Model = class Model {
     });
   }
 
-
-
-
   /**
    * Creates a new record in the database, instantiates a {@link Model} and returns it.
    *
@@ -229,7 +233,7 @@ const Model = class Model {
 
       const userPropsField = userProps[fieldName];
 
-      // ManyToMany field 在后面单独处理，所以这里先从最后的 ret 中移除
+      // ManyToMany field 在后面通过 virtualFields 单独处理，所以这里先从最后的 ret 中移除
       if (fieldInstance instanceof ManyToMany) {
         m2mRelations[fieldName] = userPropsField;
         delete ret[fieldName];
@@ -245,8 +249,8 @@ const Model = class Model {
 
         if (fieldInstance.lazy === undefined) {
           throw Error(`modelInstance.lazy can't be undefined, please file an issue!`)
-        } else {
-            fieldInstance.install(modelClass, fieldName, this.orm)
+        } else if (fieldInstance.lazy) {
+          fieldInstance.install(modelClass, fieldName, this.orm)
         }
 
         putCandidateIdKeyIntoObject(userPropsField, modelClass.idAttribute, modelClass.candidateIdKes);
@@ -543,14 +547,18 @@ const Model = class Model {
     // many-to-many related field, clear the old relations
     // and add the new ones.
     for (const updatedKey in mergeObj) { // eslint-disable-line no-restricted-syntax, guard-for-in
+      // 定义了 many 的 field 对应的 Model，如 Article 里有 { authors: many('User', 'articles') }
+      // 这个时候 Article 里的 authors 这个 field 就叫做 backward field
+      // 而 User 实例里面的 articles 就叫做 forward field
+  
+      // 如果新的 field 是 fk 或者 many，那么 field 既支持字符串，也支持对象/数组
+      // 1. 当为字符串时，代表是一个 fk 的 id，即将 fk 的 id 由一个值变为另一个值，所以这个 id 必须在 fk 对
+      // 应的 Model 中已经存在
+      // 2. 当为对象时，代表是一个 fk 或者 many 的实例，即新增了一个实例作为新的 field 的值，所以不仅要更新此 Model，
+      // 还要在 fk 和 many 对应的 Model 里面 create 这个实例
       if (fields.hasOwnProperty(updatedKey)) {
         const field = fields[updatedKey];
-
-        // 如果新的 field 是 fk 或者 many，那么 field 既支持字符串，也支持对象/数组
-        // 1. 当为字符串时，代表是一个 fk 的 id，即将 fk 的 id 由一个值变为另一个值，所以这个 id 必须在 fk 对
-        // 应的 Model 中已经存在
-        // 2. 当为对象时，代表是一个 fk 或者 many 的实例，即新增了一个实例作为新的 field 的值，所以不仅要更新此 Model，
-        // 还要在 fk 和 many 对应的 Model 里面 create 这个实例
+        
         if (field instanceof ForeignKey || field instanceof OneToOne) {
           // update one-one/fk relations
           mergeObj[updatedKey] = normalizeEntity(mergeObj[updatedKey]);
@@ -561,6 +569,7 @@ const Model = class Model {
         }
       } else if (virtualFields.hasOwnProperty(updatedKey)) {
         const field = virtualFields[updatedKey];
+        
         if (field instanceof ManyToMany) {
           // field is backward relation
           m2mRelations[updatedKey] = mergeObj[updatedKey];
@@ -626,10 +635,5 @@ const Model = class Model {
     }
   }
 };
-
-Model.fields = {
-  id: attr()
-};
-Model.virtualFields = {};
 
 export default Model;
