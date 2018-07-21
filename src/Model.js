@@ -131,7 +131,7 @@ const Model = class Model {
   }
 
   initFields (fields) {
-    this._fields = { ...fields };
+    this.finalUserProps = { ...fields };
 
     forOwn(fields, (fieldValue, fieldName) => {
       // In this case, we got a prop that wasn't defined as a field.
@@ -141,7 +141,7 @@ const Model = class Model {
       // on the prototype chain.
       if (!(fieldName in this)) {
         Object.defineProperty(this, fieldName, {
-          get: () => this._fields[fieldName],
+          get: () => this.finalUserProps[fieldName],
           set: value => this.set(fieldName, value),
           configurable: true,
           enumerable: true
@@ -172,7 +172,7 @@ const Model = class Model {
         throw new Error(`Found duplicate id(s) when passing "${normalizedNewIds}" to ${ThisModel.modelName}.${name} value`);
       }
 
-      const throughModelName = field.through || m2mName(ThisModel.modelName, name);
+      const throughModelName = field.through || m2mName(ThisModel.modelName, field.toModelName);
       const ThroughModel = ThisModel.session[throughModelName];
 
       let fromField;
@@ -209,10 +209,16 @@ const Model = class Model {
    * If you pass values for many-to-many fields, instances are created on the through
    * model as well.
    *
-   * @param  {userProps} userProps - the new {@link Model}'s properties.
+   * @param  userProps - the new {@link Model}'s properties.
    * @return {Model} a new {@link Model} instance.
    */
   static create (userProps) {
+    if (!this.hasRegisterModels) {
+      this.orm.registerManyToManyModelsFor(this, userProps);
+  
+      this.hasRegisterModels = true;
+    }
+    
     const ret = { ...userProps };
     const m2mRelations = {};
 
@@ -230,10 +236,25 @@ const Model = class Model {
           `The Model ${this.modelName} has field key: ${fieldName}, but the object which you pass doesn't have the key`
         );
       }
+  
+      if (fieldInstance.lazy === undefined) {
+        throw Error(`modelInstance.lazy can't be undefined, please file an issue!`)
+      } else if (fieldInstance.lazy) {
+        // 在 field 实例上设置 userProps，以便在 field 内部能够直接获取到 toModelName
+        // 以便能够通过 fieldInstance.toModelName 获取准确的 toModelName
+        fieldInstance.userProps = userProps;
+      }
+      
+      const toModelName = fieldInstance.toModelName;
+      const modelClass = this.orm.get(toModelName);
+      if (fieldInstance.lazy) {
+        fieldInstance.install(modelClass, fieldName, fieldInstance, this.orm)
+      }
 
       const userPropsField = userProps[fieldName];
 
-      // ManyToMany field 在后面通过 virtualFields 单独处理，所以这里先从最后的 ret 中移除
+      // ManyToMany field 在后面通过 virtualFields 单独处理，所以这里需要从最后的 ret 中删除这个字段
+      // 因为在 fields.js 里面要把 model instance 里面的 author 有一个对象变成一个 id 或者 id 数组
       if (fieldInstance instanceof ManyToMany) {
         m2mRelations[fieldName] = userPropsField;
         delete ret[fieldName];
@@ -244,15 +265,6 @@ const Model = class Model {
       // 对于 ForeignKey，存储的不应是实体，而应是实体的 id
       // 比如 reply.author 不应该是一个 User 结构的对象，而应该是 User 的 id
       if (fieldInstance instanceof ForeignKey) {
-        const toModelName = fieldInstance.toModelName(userProps);
-        const modelClass = this.orm.get(toModelName);
-
-        if (fieldInstance.lazy === undefined) {
-          throw Error(`modelInstance.lazy can't be undefined, please file an issue!`)
-        } else if (fieldInstance.lazy) {
-          fieldInstance.install(modelClass, fieldName, this.orm)
-        }
-
         putCandidateIdKeyIntoObject(userPropsField, modelClass.idAttribute, modelClass.candidateIdKes);
 
         const userPropsFieldId = userPropsField[modelClass.idAttribute];
@@ -276,7 +288,7 @@ const Model = class Model {
       }
     });
 
-    // add backward many-many if required
+    // 对于 manyToMany 的，需要添加 backward
     Object.keys(this.virtualFields).forEach(virtualFieldKey => {
       if (!m2mRelations.hasOwnProperty(virtualFieldKey) && userProps.hasOwnProperty(virtualFieldKey)) {
         const field = this.virtualFields[virtualFieldKey];
@@ -410,7 +422,7 @@ const Model = class Model {
    * @return {*} The id value of the current instance.
    */
   getId () {
-    return this._fields[this.getClass().idAttribute];
+    return this.finalUserProps[this.getClass().idAttribute];
   }
 
   /**
@@ -445,7 +457,7 @@ const Model = class Model {
         );
         return `${fieldName}: [${ids.join(', ')}]`;
       }
-      const val = this._fields[fieldName];
+      const val = this.finalUserProps[fieldName];
       return `${fieldName}: ${val}`;
     }).join(', ');
     return `${className}: {${fields}}`;
@@ -460,7 +472,7 @@ const Model = class Model {
    */
   equals (otherModel) {
     // eslint-disable-next-line no-underscore-dangle
-    return objectShallowEquals(this._fields, otherModel._fields);
+    return objectShallowEquals(this.finalUserProps, otherModel.finalUserProps);
   }
 
   /**
@@ -546,16 +558,17 @@ const Model = class Model {
     // If an array of entities or id's is supplied for a
     // many-to-many related field, clear the old relations
     // and add the new ones.
-    for (const updatedKey in mergeObj) { // eslint-disable-line no-restricted-syntax, guard-for-in
-      // 定义了 many 的 field 对应的 Model，如 Article 里有 { authors: many('User', 'articles') }
-      // 这个时候 Article 里的 authors 这个 field 就叫做 backward field
-      // 而 User 实例里面的 articles 就叫做 forward field
+    
+    // 定义了 many 的 field 对应的 Model，如 Article 里有 { author: many('User', 'articles') }
+    // 这个时候 Article 里的 author 这个 field 就叫做 forward field
+    // 而 User 实例里面的 articles 就叫做 backward field
   
-      // 如果新的 field 是 fk 或者 many，那么 field 既支持字符串，也支持对象/数组
-      // 1. 当为字符串时，代表是一个 fk 的 id，即将 fk 的 id 由一个值变为另一个值，所以这个 id 必须在 fk 对
-      // 应的 Model 中已经存在
-      // 2. 当为对象时，代表是一个 fk 或者 many 的实例，即新增了一个实例作为新的 field 的值，所以不仅要更新此 Model，
-      // 还要在 fk 和 many 对应的 Model 里面 create 这个实例
+    // 如果新的 field 是 fk 或者 many，那么 field 既支持字符串，也支持对象/数组
+    // 1. 当为字符串时，代表是一个 fk 的 id，即将 fk 的 id 由一个值变为另一个值，所以这个 id 必须在 fk 对
+    // 应的 Model 中已经存在
+    // 2. 当为对象时，代表是一个 fk 或者 many 的实例，即新增了一个实例作为新的 field 的值，所以不仅要更新此 Model，
+    // 还要在 fk 和 many 对应的 Model 里面 create 这个实例
+    for (const updatedKey in mergeObj) { // eslint-disable-line no-restricted-syntax, guard-for-in
       if (fields.hasOwnProperty(updatedKey)) {
         const field = fields[updatedKey];
         
@@ -579,7 +592,7 @@ const Model = class Model {
     }
 
     // 对于不属于 fileds 里面的属性，需要直接加到 model 实例上
-    this.initFields(Object.assign({}, this._fields, mergeObj));
+    this.initFields(Object.assign({}, this.finalUserProps, mergeObj));
 
     // 对于 many，需要同步
     this._refreshMany2Many(m2mRelations); // eslint-disable-line no-underscore-dangle

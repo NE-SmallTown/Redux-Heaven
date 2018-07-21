@@ -34,7 +34,7 @@ export class Attribute {
     }
   }
 
-  install (model, fieldName) {
+  install (model, fieldName, fieldInstance, orm) {
     Object.defineProperty(
       model.prototype,
       fieldName,
@@ -46,11 +46,12 @@ export class Attribute {
 class RelationalField {
   constructor (...args) {
     this.lazy = false;
-
+    let toModelName;
+  
     if (args.length === 1 && isPlainObject(args[0])) {
       const { to, fieldKeyInToMoel, through, throughFields } = args[0];
 
-      this.toModelName = to;
+      this.toModelName = toModelName = to;
       this.fieldKeyInToMoel = fieldKeyInToMoel;
       this.through = through;
       this.throughFields = throughFields;
@@ -74,28 +75,56 @@ class RelationalField {
       }
 
       // this.toModelName = memoize(args[0]); // 是对象，不好缓存，但是也不好只传 type
-      this.toModelName = args[0];
+      this.toModelName = toModelName = args[0];
       this.fieldKeyInToMoel = args[1];
     }
 
-    if (typeof this.toModelName === 'undefined' || typeof this.fieldKeyInToMoel === 'undefined') {
-      const toModelName = this.toModelName;
-      const fieldKeyInToMoel = this.fieldKeyInToMoel;
-
+    if (toModelName === undefined || typeof this.fieldKeyInToMoel === 'undefined') {
       this.clearFields();
 
       throw new Error(`When you use fk or many, you must provide 'to' and 'fieldKeyInToMoel'(when you pass an object
         the function) or provide at least two arguments(arguments[0] for 'to', arguments[1] for 'fieldKeyInToMoel').
-        both of then can't be undefined, but now passed in to: ${toModelName}, fieldKeyInToMoel: ${fieldKeyInToMoel}`
+        both of then can't be undefined, but now passed in to: ${toModelName}, fieldKeyInToMoel: ${this.fieldKeyInToMoel}`
       );
     }
+  }
+  
+  get toModelName() {
+    if (this.lazy) {
+      if (!this.userProps) {
+        throw Error(`Can't find userProps in field instance when get toModelName, please file an issue!`)
+      }
+      
+      return this.localToModelName(this.userProps)[0]
+    }
+    
+    return this.localToModelName;
+  }
+  
+  set toModelName(v) {
+    this.localToModelName = v;
+  }
+  
+  get fieldKeyInToMoel() {
+    if (this.lazy) {
+      if (!this.userProps) {
+        throw Error(`Can't find userProps in field instance when get fieldKeyInToMoel, please file an issue!`)
+      }
+      
+      return this.localToModelName(this.userProps)[1]
+    }
+    
+    return this.localFieldKeyInToMoel;
+  }
+  
+  set fieldKeyInToMoel(v) {
+    this.localFieldKeyInToMoel = v;
   }
 
   clearFields () {
     delete this.toModelName;
     delete this.fieldKeyInToMoel;
     delete this.through;
-    delete this.toModelName;
   }
 
   getClass () {
@@ -106,7 +135,7 @@ class RelationalField {
 export class ForeignKey extends RelationalField {
   // 调用方式为：fieldInstance.install(model, fieldName, ormInstance)
   // fieldName 为 model 的某个 field 的 key
-  install (model, fieldName, orm) {
+  install (model, fieldName, fieldInstance, orm) {
     const toModel = orm.get(this.toModelName);
 
     // 比如 Model fields 里面有：{ author: fk('User', 'books') }
@@ -150,9 +179,10 @@ export class ForeignKey extends RelationalField {
 
 // through 即中间表
 export class ManyToMany extends RelationalField {
-  install (model, fieldName, orm) {
+  install (model, fieldName, fieldInstance, orm) { // fieldName 比如 author，orm 即 orm 实例
+    // toModelName 比如 author: many('User', 'articles')的话就是 User，注意 toModelName 可能是一个函数
     const toModel = orm.get(this.toModelName);
-    const throughModelName = this.through || m2mName(model.modelName, fieldName);
+    const throughModelName = this.through || m2mName(model.modelName, fieldInstance.toModelName);
     const throughModel = orm.get(throughModelName);
 
     let throughFields;
@@ -171,13 +201,15 @@ export class ManyToMany extends RelationalField {
         };
       }
     } else {
-      const toFieldName = findKey(
-        throughModel.fields,
-        field => field instanceof ForeignKey && field.toModelName === toModel.modelName // toModel.modelName: 'User'
-      );
+      // 如 fromFieldName = 'articleId'
       const fromFieldName = findKey(
         throughModel.fields,
         field => field instanceof ForeignKey && field.toModelName === model.modelName // model.modelName: 'Article'
+      );
+      // 如 toFieldName = 'userId'
+      const toFieldName = findKey(
+        throughModel.fields,
+        field => field instanceof ForeignKey && field.toModelName === toModel.modelName // toModel.modelName: 'User'
       );
       
       throughFields = {
@@ -185,15 +217,16 @@ export class ManyToMany extends RelationalField {
         to: toFieldName
       };
     }
-
+    
+    // 重新定义 Article model 上的 author 字段，使其不再是一个对象或者对象数组，而是一个 id 或者 id 数组
     Object.defineProperty(
-      model.prototype, // Article
-      fieldName, // authors
+      model.prototype, // Article.prototype
+      fieldName, // author
       manyToManyDescriptor(
-        model.modelName,
-        toModel.modelName,
-        throughModelName,
-        throughFields,
+        model.modelName, // Article
+        toModel.modelName, // User
+        throughModelName, // Article-User
+        throughFields, // { from: 'articleId', to: 'userId' }
         false
       )
     );
@@ -205,6 +238,7 @@ export class ManyToMany extends RelationalField {
       throughFields
     });
 
+    // articles
     const backwardsFieldName = this.fieldKeyInToMoel;
 
     const backwardsDescriptor = Object.getOwnPropertyDescriptor(
@@ -223,6 +257,7 @@ export class ManyToMany extends RelationalField {
       throw new Error(errorMsg);
     }
 
+    // 在 User Model 上定义 articles 字段
     Object.defineProperty(
       toModel.prototype,
       backwardsFieldName,
@@ -248,7 +283,7 @@ export class ManyToMany extends RelationalField {
 }
 
 export class OneToOne extends RelationalField {
-  install (model, fieldName, orm) {
+  install (model, fieldName, fieldInstance, orm) {
     const toModel = orm.get(this.toModelName);
 
     Object.defineProperty(

@@ -53,46 +53,49 @@ export const ORM = class ORM {
   }
 
   /**
-     * Registers a {@link Model} class to the ORM.
-     *
-     * If the model has declared any ManyToMany fields, their
-     * through models will be generated and registered with
-     * this call, unless a custom through model has been specified.
-     *
-     * @param  {...Model} model - a {@link Model} class to register
-     * @return {undefined}
-     */
+   * Registers a {@link Model} class to the ORM.
+   *
+   * If the model has declared any ManyToMany fields, their
+   * through models will be generated and registered with
+   * this call, unless a custom through model has been specified.
+   *
+   * @param  {...Model} models - a {@link Model} class to register
+   * @return {undefined}
+   */
   register (...models) {
-    models.forEach((model) => {
+    models.forEach(model => {
       model.resetClassCache();
       model.setOrm(this);
 
-      this.registerManyToManyModelsFor(model);
       this.registry.push(model);
     });
   }
 
-  registerManyToManyModelsFor (model) {
+  registerManyToManyModelsFor (model, userProps) {
     const fields = model.fields;
     const thisModelName = model.modelName;
 
-    forOwn(fields, (fieldInstance, fieldName) => {
+    forOwn(fields, fieldInstance => {
       if (fieldInstance instanceof ManyToMany && !fieldInstance.through) {
-        const toModelName = fieldInstance.toModelName;
+        const toModelName = fieldInstance.lazy
+          ? fieldInstance.toModelName(userProps)[0] : fieldInstance.toModelName;
 
         // TODO 感觉可以完全消除中间表
         class ThroughModel extends Model {
-          static modelName = m2mName(thisModelName, fieldName);
+          // 如 thisModelName = 'Article', toModelName = 'User', 所以结果为 'Article-User'
+          static modelName = m2mName(thisModelName, toModelName);
 
           static fields = {
             id: attr(),
-            [m2mFromFieldName(thisModelName)]: new ForeignKey(thisModelName), // 如 'fromArticleId'
-            [m2mToFieldName(toModelName)]: new ForeignKey(toModelName) // 如 'toUserId'
+            // 如 'articleId'
+            [m2mFromFieldName(thisModelName)]: new ForeignKey(thisModelName),
+            // 如 'userId'
+            [m2mToFieldName(toModelName)]: new ForeignKey(toModelName)
           }
         }
 
         ThroughModel.resetClassCache();
-        this.implicitThroughModels.push(Through);
+        this.implicitThroughModels.push(ThroughModel);
       }
     });
   }
@@ -142,8 +145,10 @@ export const ORM = class ORM {
         const fields = model.fields;
         forOwn(fields, (fieldInstance, fieldName) => {
           if (!this.isFieldInstalled(model.modelName, fieldName)) {
+            // lazy 的话由于需要 userProps 来判断到底 fk 或者 many 的 toModelName 是什么
+            // 所以放在 create 的时候再去 install
             if (!fieldInstance.lazy) {
-                fieldInstance.install(model, fieldName, this);
+                fieldInstance.install(model, fieldName, fieldInstance, this);
                 this.setFieldInstalled(model.modelName, fieldName);
             }
           }

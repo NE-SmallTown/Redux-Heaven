@@ -6,7 +6,7 @@ import {
 
 const attrDescriptor = (fieldName) => ({
   get () {
-    return this._fields[fieldName];
+    return this.finalUserProps[fieldName];
   },
 
   set (value) {
@@ -17,22 +17,22 @@ const attrDescriptor = (fieldName) => ({
   configurable: true
 });
 
-const fieldToFkModelObjDescriptor = (fieldName, declaredToModelName) => ({
+const fieldToFkModelObjDescriptor = (fieldName, toModelName) => ({
   get () {
-    const currentSession = this.getClass().session;
-    const declaredToModel = currentSession[declaredToModelName];
-    const toId = this._fields[fieldName];
+    const session = this.getClass().session;
+    const toModel = session[toModelName];
+    const toId = this.finalUserProps[fieldName];
 
     if (typeof toId !== 'undefined' && toId !== null) {
-      return declaredToModel.withId(toId);
+      return toModel.withId(toId);
     }
   },
   set (value) {
-    const currentSession = this.getClass().session;
-    const declaredToModel = currentSession[declaredToModelName];
+    const session = this.getClass().session;
+    const toModel = session[toModelName];
 
     let toId;
-    if (value instanceof declaredToModel) {
+    if (value instanceof toModel) {
       toId = value.getId();
     } else {
       toId = value;
@@ -43,32 +43,32 @@ const fieldToFkModelObjDescriptor = (fieldName, declaredToModelName) => ({
 });
 
 // Reverse side of a Foreign Key: returns many objects.
-const fkModelObjToFieldDescriptor = (declaredFieldName, declaredFromModelName) => ({
+const fkModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
   get () {
-    const currentSession = this.getClass().session;
-    const declaredFromModel = currentSession[declaredFromModelName];
+    const session = this.getClass().session;
+    const fromModel = session[fromModelName];
     const thisId = this.getId();
     // session.Host.withId(hostId).replies 会执行到这些，然后接下来执行 .filter，.filter 会返回 QuerySet，
     // 所以才能够继续执行 .replies.toRefArray()，但是默认情况下我们并不需要执行 .toRefArray()，因为大多数情况
     // 本身就希望得到的是 refArray，而不是 QuerySet，所以这里改成默认返回 refArray，如果需要返回 QuerySet，
     // 则需要用显式的方式，即 model.getQuerySet()
-    // 原本代码为：return declaredFromModel.filter({ [declaredFieldName]: thisId });
+    // 原本代码为：return fromModel.filter({ [declaredFieldName]: thisId });
     // 修改后代码为：
-    return declaredFromModel.filter({ [declaredFieldName]: thisId }).toRefArray();
+    return fromModel.filter({ [declaredFieldName]: thisId }).toRefArray();
   },
   set () {
     throw new Error('Can\'t mutate a reverse many-to-one relation.');
   }
 });
 
-const oneModelObjToFieldDescriptor = (declaredFieldName, declaredFromModelName) => ({
+const oneModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
   get () {
-    const currentSession = this.getClass().session;
-    const declaredFromModel = currentSession[declaredFromModelName];
+    const session = this.getClass().session;
+    const fromModel = session[fromModelName];
     const thisId = this.getId();
     let found;
     try {
-      found = declaredFromModel.get({ [declaredFieldName]: thisId });
+      found = fromModel.get({ [declaredFieldName]: thisId });
     } catch (e) {
       return null;
     }
@@ -81,21 +81,18 @@ const oneModelObjToFieldDescriptor = (declaredFieldName, declaredFromModelName) 
 
 // Both sides of Many to Many, use the reverse flag.
 const manyToManyDescriptor = (
-  declaredFromModelName,
-  declaredToModelName,
-  throughModelName,
-  throughFields,
+  fromModelName, // Article
+  toModelName, // User
+  throughModelName, // Article-User
+  throughFields, // { from: 'articleId', to: 'userId' }
   reverse
 ) => ({
   get () {
-    const currentSession = this.getClass().session;
-    const declaredFromModel = currentSession[declaredFromModelName];
-    const declaredToModel = currentSession[declaredToModelName];
-    const throughModel = currentSession[throughModelName];
-    const thisId = this.getId();
-
-    const fromFieldName = throughFields.from;
-    const toFieldName = throughFields.to;
+    const session = this.getClass().session;
+    const {fromModelName: fromModel, toModelName: toModel, throughModelName: throughModel} = session;
+    const thisId = this.getId(); // userProps 里 id 的值
+    const fromFieldName = throughFields.from; // 如 articleId
+    const toFieldName = throughFields.to; // 如 'userId'
 
     const lookupObj = {};
     if (!reverse) {
@@ -103,11 +100,11 @@ const manyToManyDescriptor = (
     } else {
       lookupObj[toFieldName] = thisId;
     }
-
+    感觉不应该定义成 descriptor 的 get，直接在原型上赋值 author 成 id 不就好了吗？
     const throughQs = throughModel.filter(lookupObj);
     const toIds = throughQs.toRefArray().map(obj => obj[reverse ? fromFieldName : toFieldName]);
 
-    const qsFromModel = reverse ? declaredFromModel : declaredToModel;
+    const qsFromModel = reverse ? fromModel : toModel;
     const qs = qsFromModel.filter(attrs =>
       includes(toIds, attrs[qsFromModel.idAttribute])
     );
@@ -125,12 +122,12 @@ const manyToManyDescriptor = (
           .map(through => through[filterWithAttr]);
 
         const toAddModel = reverse
-          ? declaredFromModel.modelName
-          : declaredToModel.modelName;
+          ? fromModel.modelName
+          : toModel.modelName;
 
         const addFromModel = reverse
-          ? declaredToModel.modelName
-          : declaredFromModel.modelName;
+          ? toModel.modelName
+          : fromModel.modelName;
         throw new Error(`Tried to add already existing ${toAddModel} id(s) ${existingIds} to the ${addFromModel} instance with id ${thisId}`);
       }
 
@@ -172,12 +169,12 @@ const manyToManyDescriptor = (
         const unexistingIds = difference(idsToRemove, entitiesToDeleteIds);
 
         const toDeleteModel = reverse
-          ? declaredFromModel.modelName
-          : declaredToModel.modelName;
+          ? fromModel.modelName
+          : toModel.modelName;
 
         const deleteFromModel = reverse
-          ? declaredToModel.modelName
-          : declaredFromModel.modelName;
+          ? toModel.modelName
+          : fromModel.modelName;
 
         throw new Error(`Tried to delete non-existing ${toDeleteModel} id(s) ${unexistingIds} from the
           ${deleteFromModel} instance with id ${thisId}`
@@ -191,7 +188,7 @@ const manyToManyDescriptor = (
   },
 
   set () {
-    throw new Error('Tried setting a M2M field. Please use the related QuerySet methods add and remove.');
+    throw new Error('You can\'t setting a many2Many field directly. Please use the related QuerySet methods add and remove.');
   }
 });
 

@@ -14,25 +14,21 @@ import difference from 'lodash/difference';
  * @module utils
  */
 
-function capitalize (string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 /**
  * Returns the branch name for a many-to-many relation.
- * The name is the combination of the model name and the field name the relation
- * was declared. The field name's first letter is capitalized.
+ * The name is the combination of the model name and the model name the relation
+ * was declared.
  *
- * Example: model `Author` has a many-to-many relation to the model `Book`, defined
- * in the `Author` field `books`. The many-to-many branch name will be `AuthorBooks`.
+ * Example: model `Article` has a many-to-many relation to the model `User`, defined
+ * in the `Article` field `author`. The many-to-many branch name will be `Article-User`.
  *
  * @private
  * @param  {string} declarationModelName - the name of the model the many-to-many relation was declared on
- * @param  {string} fieldName            - the field name where the many-to-many relation was declared on
+ * @param  {string} toModelName - the model name where the many-to-many relation was declared on
  * @return {string} The branch name for the many-to-many relation.
  */
-function m2mName (declarationModelName, fieldName) {
-  return declarationModelName + capitalize(fieldName);
+function m2mName (declarationModelName, toModelName) {
+  return declarationModelName + '-' + toModelName;
 }
 
 /**
@@ -45,24 +41,20 @@ function m2mName (declarationModelName, fieldName) {
  * @param  {string} declarationModelName - the name of the model where the relation was declared
  * @return {string} the field name in the through model for `declarationModelName`'s foreign key.
  */
-function m2mFromFieldName (declarationModelName) {
-  return `from${declarationModelName}Id`;
-}
+const m2mFromFieldName = declarationModelName => declarationModelName + 'Id';
 
 /**
  * Returns the fieldname that saves a foreign key in a many-to-many through model to the
  * model where the many-to-many relation was declared.
  *
- * Example: `Book` => `toBookId`
+ * Example: `User` => `userId`
  *
  * @private
  * @param  {string} otherModelName - the name of the model that was the target of the many-to-many
  *                                   declaration.
  * @return {string} the field name in the through model for `otherModelName`'s foreign key..
  */
-function m2mToFieldName (otherModelName) {
-  return `to${otherModelName}Id`;
-}
+const m2mToFieldName = m2mFromFieldName;
 
 function querySetDelegatorFactory (methodName) {
   return function querySetDelegator (...args) {
@@ -122,7 +114,7 @@ function attachQuerySetMethods (modelClass, querySetClass) {
  * @return {*} the id value of `entity`
  */
 const normalizeEntity = entity => {
-  if (entity != null && typeof entity.getId === 'function') {
+  if (entity && typeof entity.getId === 'function') {
     return entity.getId();
   }
 
