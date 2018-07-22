@@ -33,6 +33,7 @@ import {
  * QuerySet instances also return copies, so chaining filters doesn't
  * mutate the previous instances.
  */
+// 一个 QuerySet 是一系列操作（如 UPDATE, DELETE, FILTER, EXCLUDE, ORDER_BY 等）的链式集合，依次执行
 const QuerySet = class QuerySet {
   /**
    * Creates a QuerySet. The constructor is mainly for internal use;
@@ -166,6 +167,7 @@ const QuerySet = class QuerySet {
       ? mapValues(lookupObj, normalizeEntity)
       : lookupObj;
     const filterDescriptor = { type: FILTER, payload: normalizedLookupObj };
+    
     return this._new(this.clauses.concat(filterDescriptor));
   }
 

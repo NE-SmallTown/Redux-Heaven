@@ -227,10 +227,12 @@ export class ManyToMany extends RelationalField {
         toModel.modelName, // User
         throughModelName, // Article-User
         throughFields, // { from: 'articleId', to: 'userId' }
+        fieldName,
         false
       )
     );
-
+    
+    下次从这里开始
     model.virtualFields[fieldName] = new ManyToMany({
       to: toModel.modelName,
       fieldKeyInToMoel: fieldName,
@@ -266,6 +268,7 @@ export class ManyToMany extends RelationalField {
         toModel.modelName,
         throughModelName,
         throughFields,
+        fieldName,
         true
       )
     );

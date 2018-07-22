@@ -114,11 +114,11 @@ function attachQuerySetMethods (modelClass, querySetClass) {
  * @return {*} the id value of `entity`
  */
 const normalizeEntity = entity => {
-  if (entity && typeof entity.getId === 'function') {
-    return entity.getId();
+  if (!entity) {
+    throw Error(`You must pass entity but got ${entity}`)
   }
 
-  return entity;
+  return entity.getId ? entity.getId() : entity;
 };
 
 function reverseFieldErrorMessage (modelName, fieldName, toModelName, backwardsFieldName) {
