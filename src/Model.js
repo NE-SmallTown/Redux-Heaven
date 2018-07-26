@@ -289,6 +289,8 @@ const Model = class Model {
     });
 
     // 对于 manyToMany 的，需要添加 backward
+    // this.virtualFields 由 fields.js 在 install field instance 的时候创建，用来记录 field 对应的中间表信息
+    下次从这里开始看
     Object.keys(this.virtualFields).forEach(virtualFieldKey => {
       if (!m2mRelations.hasOwnProperty(virtualFieldKey) && userProps.hasOwnProperty(virtualFieldKey)) {
         const field = this.virtualFields[virtualFieldKey];

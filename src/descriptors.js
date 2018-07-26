@@ -70,14 +70,10 @@ const oneModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
     const session = this.getClass().session;
     const fromModel = session[fromModelName];
     const thisId = this.getId();
-    let found;
-    try {
-      found = fromModel.get({ [declaredFieldName]: thisId });
-    } catch (e) {
-      return null;
-    }
-    return found;
+
+    return fromModel.get({ [declaredFieldName]: thisId });
   },
+  
   set () {
     throw new Error('Can\'t mutate a reverse one-to-one relation.');
   }
@@ -199,11 +195,12 @@ const manyToManyDescriptor = memoize((
 
 const fieldToOneModelObjDescriptor = fieldToFkModelObjDescriptor;
 
+// TODO 调整命名
 export {
   attrDescriptor,
   fieldToFkModelObjDescriptor,
-  fkModelObjToFieldDescriptor,
   fieldToOneModelObjDescriptor,
+  fkModelObjToFieldDescriptor,
   oneModelObjToFieldDescriptor,
   manyToManyDescriptor
 };

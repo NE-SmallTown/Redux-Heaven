@@ -79,7 +79,7 @@ class RelationalField {
       this.fieldKeyInToMoel = args[1];
     }
 
-    if (toModelName === undefined || typeof this.fieldKeyInToMoel === 'undefined') {
+    if (toModelName === undefined || this.fieldKeyInToMoel === undefined) {
       this.clearFields();
 
       throw new Error(`When you use fk or many, you must provide 'to' and 'fieldKeyInToMoel'(when you pass an object
@@ -227,56 +227,54 @@ export class ManyToMany extends RelationalField {
         toModel.modelName, // User
         throughModelName, // Article-User
         throughFields, // { from: 'articleId', to: 'userId' }
-        fieldName,
+        fieldName, // author
         false
       )
     );
     
-    下次从这里开始
+    // model.virtualFields['author']
     model.virtualFields[fieldName] = new ManyToMany({
-      to: toModel.modelName,
-      fieldKeyInToMoel: fieldName,
+      to: toModel.modelName, // 等价于 many('', '') 的第一个参数
+      fieldKeyInToMoel: fieldName, // 等价于 many('', '') 的第二个参数
       through: this.through,
-      throughFields
+      throughFields // 中间表的属性，包含 from 和 to，如 {from: 'articleId', to: 'userId'}
     });
-
-    // articles
-    const backwardsFieldName = this.fieldKeyInToMoel;
-
-    const backwardsDescriptor = Object.getOwnPropertyDescriptor(
-      toModel.prototype,
-      backwardsFieldName
-    );
-
-    if (backwardsDescriptor) {
-      // Backwards field was already defined on toModel.
-      const errorMsg = reverseFieldErrorMessage(
-        model.modelName,
-        fieldName,
-        toModel.modelName,
-        backwardsFieldName
-      );
-      throw new Error(errorMsg);
+    
+    const backwardsFieldName = this.fieldKeyInToMoel; // articles
+    if (__DEV__) {
+      if (Object.getOwnPropertyDescriptor(toModel.prototype, backwardsFieldName)) {
+        // Backwards field was already defined on toModel.
+        const errorMsg = reverseFieldErrorMessage(
+          model.modelName,
+          fieldName,
+          toModel.modelName,
+          backwardsFieldName
+        );
+    
+        throw new Error(errorMsg);
+      }
     }
 
-    // 在 User Model 上定义 articles 字段
+    // 定义 backward 字段，如在 User Model 上定义 articles 字段
     Object.defineProperty(
       toModel.prototype,
       backwardsFieldName,
       manyToManyDescriptor(
-        model.modelName,
-        toModel.modelName,
-        throughModelName,
-        throughFields,
-        fieldName,
-        true
+        model.modelName, // 这里还是 Artcile 而不是 User，因为下方设置了 true
+        toModel.modelName, // User
+        throughModelName, // Article-User
+        throughFields, // { from: 'articleId', to: 'userId' }
+        fieldName, // author
+        true // 翻转 fromModel 和 toModel，减少 manyToManyDescriptor 里的重复代码
       )
     );
+  
+    // toModel.virtualFields['articles']
     toModel.virtualFields[backwardsFieldName] = new ManyToMany({
-      to: model.modelName,
-      fieldKeyInToMoel: fieldName,
-      through: throughModelName,
-      throughFields
+      to: model.modelName, // Article
+      fieldKeyInToMoel: fieldName, // author
+      through: throughModelName, // Article-User
+      throughFields // { from: 'articleId', to: 'userId' }
     });
   }
 
@@ -288,37 +286,31 @@ export class ManyToMany extends RelationalField {
 export class OneToOne extends RelationalField {
   install (model, fieldName, fieldInstance, orm) {
     const toModel = orm.get(this.toModelName);
-
+    
     Object.defineProperty(
       model.prototype,
-      fieldName,
+      fieldName, // author
       fieldToOneModelObjDescriptor(fieldName, toModel.modelName)
     );
 
-    const backwardsFieldName = this.fieldKeyInToMoel
-      ? this.fieldKeyInToMoel
-      : model.modelName.toLowerCase();
-
-    const backwardsDescriptor = Object.getOwnPropertyDescriptor(
-      toModel.prototype,
-      backwardsFieldName
-    );
-
-    if (backwardsDescriptor) {
+    const backwardsFieldName = this.fieldKeyInToMoel; // artciles
+    if (Object.getOwnPropertyDescriptor(toModel.prototype, backwardsFieldName)) {
       const errorMsg = reverseFieldErrorMessage(
         model.modelName,
         fieldName,
         toModel.modelName,
         backwardsFieldName
       );
+      
       throw new Error(errorMsg);
     }
 
     Object.defineProperty(
       toModel.prototype,
-      backwardsFieldName,
+      backwardsFieldName, // artciles
       oneModelObjToFieldDescriptor(fieldName, model.modelName)
     );
+    
     toModel.virtualFields[backwardsFieldName] = new OneToOne(model.modelName, fieldName);
   }
 }

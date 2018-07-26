@@ -121,11 +121,10 @@ const normalizeEntity = entity => {
   return entity.getId ? entity.getId() : entity;
 };
 
-function reverseFieldErrorMessage (modelName, fieldName, toModelName, backwardsFieldName) {
-  return [`Reverse field ${backwardsFieldName} already defined`,
-    ` on model ${toModelName}. To fix, set a custom related`,
-    ` name on ${modelName}.${fieldName}.`].join('');
-}
+const reverseFieldErrorMessage = (modelName, fieldName, toModelName, backwardsFieldName) => `
+  Reverse field ${backwardsFieldName} already defined on model ${toModelName}.
+  To fix, set a custom related name on ${modelName}.${fieldName}.
+`;
 
 function objectShallowEquals (a, b) {
   let keysInA = 0;
