@@ -1,8 +1,5 @@
 import mapValues from 'lodash/mapValues';
-import {
-  normalizeEntity,
-  warnDeprecated
-} from './utils';
+import { normalizeEntity, } from './utils';
 
 import {
   UPDATE,

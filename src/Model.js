@@ -253,11 +253,10 @@ const Model = class Model {
 
       const userPropsField = userProps[fieldName];
 
-      // ManyToMany field 在后面通过 virtualFields 单独处理，所以这里需要从最后的 ret 中删除这个字段
-      // 因为在 fields.js 里面要把 model instance 里面的 author 有一个对象变成一个 id 或者 id 数组
+      // fieldInstance.install 的时候在 fields.js 里面已经把 model instance 里面的 author 变成了一个 id 数组的 QuerySet
       if (fieldInstance instanceof ManyToMany) {
         m2mRelations[fieldName] = userPropsField;
-        delete ret[fieldName];
+        ret[fieldName] = this[fieldName].toRefArray();
 
         return;
       }
@@ -288,20 +287,6 @@ const Model = class Model {
       }
     });
 
-    // 对于 manyToMany 的，需要添加 backward
-    // this.virtualFields 由 fields.js 在 install field instance 的时候创建，用来记录 field 对应的中间表信息
-    下次从这里开始看
-    Object.keys(this.virtualFields).forEach(virtualFieldKey => {
-      if (!m2mRelations.hasOwnProperty(virtualFieldKey) && userProps.hasOwnProperty(virtualFieldKey)) {
-        const field = this.virtualFields[virtualFieldKey];
-
-        if (field instanceof ManyToMany) {
-          m2mRelations[virtualFieldKey] = userProps[virtualFieldKey];
-          delete ret[virtualFieldKey];
-        }
-      }
-    });
-
     const newEntry = this.session.execute({
       action: CREATE,
       table: this.modelName,
@@ -310,8 +295,10 @@ const Model = class Model {
 
     const ModelClass = this;
     const instance = new ModelClass(newEntry);
+    
     // 然后再把相关的属性加在中间表里面
     instance._refreshMany2Many(m2mRelations); // eslint-disable-line no-underscore-dangle
+    
     return instance;
   }
 
@@ -350,7 +337,7 @@ const Model = class Model {
     }
 
     const ModelClass = this;
-    const rows = this._findDatabaseRows({ [ModelClass.idAttribute]: id });
+    const rows = this.findDatabaseRows({ [ModelClass.idAttribute]: id });
 
     return new ModelClass(rows[0]);
   }
@@ -363,11 +350,11 @@ const Model = class Model {
    * @return {Boolean} a boolean indicating if entity with `id` exists in the state
    */
   static hasId (id) {
-    const rows = this._findDatabaseRows({ [this.idAttribute]: id });
+    const rows = this.findDatabaseRows({ [this.idAttribute]: id });
     return rows.length === 1;
   }
 
-  static _findDatabaseRows (lookupObj) {
+  static findDatabaseRows (lookupObj) {
     const ModelClass = this;
     return ModelClass
       .session
@@ -393,7 +380,7 @@ const Model = class Model {
   static get (lookupObj) {
     const ModelClass = this;
 
-    const rows = this._findDatabaseRows(lookupObj);
+    const rows = this.findDatabaseRows(lookupObj);
 
     if (rows.length === 0) {
       throw new Error('Model instance not found when calling get method');
@@ -437,7 +424,7 @@ const Model = class Model {
     const ModelClass = this.getClass();
 
     // eslint-disable-next-line no-underscore-dangle
-    return ModelClass._findDatabaseRows({
+    return ModelClass.findDatabaseRows({
       [ModelClass.idAttribute]: this.getId()
     })[0];
   }
@@ -603,15 +590,6 @@ const Model = class Model {
       action: UPDATE,
       payload: mergeObj
     });
-  }
-
-  /**
-   * Updates {@link Model} instance attributes to reflect the
-   * database state in the current session.
-   * @return {undefined}
-   */
-  refreshFromState () {
-    this.initFields(this.ref);
   }
 
   /**

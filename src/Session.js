@@ -15,6 +15,7 @@ const Session = class Session {
   /**
    * Creates a new Session.
    *
+   * @param  {ORM} orm - a {@link ORM} instance
    * @param  {Database} db - a {@link Database} instance
    * @param  {Object} state - the database state
    * @param  {Boolean} [withMutations] - whether the session should mutate data
@@ -25,36 +26,15 @@ const Session = class Session {
     this.orm = orm;
     this.db = db;
     this.state = state || db.getState();
-    this.initialState = this.state;
 
-    this.withMutations = !!withMutations;
+    this.withMutations = withMutations;
     this.batchToken = batchToken || getBatchToken();
 
-    this._accessedModels = {};
     this.modelData = {};
-
-    this.models = orm.getModelClasses();
-
-    this.sessionBoundModels = this.models.map((modelClass) => {
-      const sessionBoundModel = class SessionBoundModel extends modelClass {};
-
-      Object.defineProperty(this, modelClass.modelName, {
-        get: () => sessionBoundModel
-      });
-
-      sessionBoundModel.connect(this);
-      return sessionBoundModel;
-    });
   }
 
   markAccessed (modelName) {
     this.getDataForModel(modelName).accessed = true;
-  }
-
-  get accessedModels () {
-    return this.sessionBoundModels
-      .filter(model => !!this.getDataForModel(model.modelName).accessed)
-      .map(model => model.modelName);
   }
 
   getDataForModel (modelName) {
@@ -68,26 +48,26 @@ const Session = class Session {
    * Applies operation to a model state.
    *
    * @private
-   * @param {Object} update - the update object. Must have keys
-   *                          `type`, `payload`.
+   * @param {Object} updateSpec - the update object. Must have keys `action`, `payload`.
    */
+  // 对数据库执行某种操作
   execute (updateSpec) {
-    const { batchToken, withMutations } = this;
-    const tx = { batchToken, withMutations };
+    const tx = { batchToken: this.batchToken, withMutations: this.withMutations };
     const { status, state, payload } = this.db.execute(updateSpec, tx, this.state);
 
     if (status === SUCCESS) {
       this.state = state;
+  
+      return payload;
     } else {
       invariant(false, `Applying update failed`);
     }
-
-    return payload;
   }
 
   query (querySpec) {
     const { table } = querySpec;
     this.markAccessed(table);
+    
     return this.db.execute({ action: QUERY, ...querySpec }, this.state);
   }
 };

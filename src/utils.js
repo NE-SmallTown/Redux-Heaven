@@ -6,7 +6,6 @@
 
 import forOwn from 'lodash/forOwn';
 import includes from 'lodash/includes';
-import ops from 'immutable-ops';
 import intersection from 'lodash/intersection';
 import difference from 'lodash/difference';
 
@@ -27,9 +26,7 @@ import difference from 'lodash/difference';
  * @param  {string} toModelName - the model name where the many-to-many relation was declared on
  * @return {string} The branch name for the many-to-many relation.
  */
-function m2mName (declarationModelName, toModelName) {
-  return declarationModelName + '-' + toModelName;
-}
+const m2mName = (declarationModelName, toModelName) => declarationModelName + '-' + toModelName;
 
 /**
  * Returns the fieldname that saves a foreign key to the
@@ -56,28 +53,27 @@ const m2mFromFieldName = declarationModelName => declarationModelName + 'Id';
  */
 const m2mToFieldName = m2mFromFieldName;
 
-function querySetDelegatorFactory (methodName) {
-  return function querySetDelegator (...args) {
-    return this.getQuerySet()[methodName](...args);
-  };
-}
+const querySetDelegatorFactory = methodName => function(...args) {
+  return this.getQuerySet()[methodName](...args)
+};
 
-function querySetGetterDelegatorFactory (getterName) {
-  return function querySetGetterDelegator () {
-    const qs = this.getQuerySet();
-    return qs[getterName];
-  };
-}
+const querySetGetterDelegatorFactory = getterName => function () {
+  const qs = this.getQuerySet();
+  
+  return qs[getterName];
+};
 
-function forEachSuperClass (subClass, func) {
+
+const forEachSuperClass = (subClass, func) => {
   let currClass = subClass;
+  
   while (currClass !== Function.prototype) {
     func(currClass);
     currClass = Object.getPrototypeOf(currClass);
   }
-}
+};
 
-function attachQuerySetMethods (modelClass, querySetClass) {
+const attachQuerySetMethods = (modelClass, querySetClass) => {
   const leftToDefine = querySetClass.sharedMethods.slice();
 
   // There is no way to get a property descriptor for the whole prototype chain;
@@ -103,7 +99,7 @@ function attachQuerySetMethods (modelClass, querySetClass) {
       }
     }
   });
-}
+};
 
 /**
  * Normalizes `entity` to an id, where `entity` can be an id
@@ -158,14 +154,12 @@ function putCandidateIdKeyIntoObject (obj, idAttribute, candidateIdKes) {
   if (!obj[idAttribute]) {
     for (const key of candidateIdKes) {
       if (obj[key]) {
-          obj[idAttribute] = obj[key]
-          break
+          obj[idAttribute] = obj[key];
+          break;
       }
     }
   }
 }
-
-const { getBatchToken } = ops;
 
 export {
   attachQuerySetMethods,
@@ -175,9 +169,7 @@ export {
   normalizeEntity,
   reverseFieldErrorMessage,
   objectShallowEquals,
-  ops,
   includes,
   arrayDiffActions,
   putCandidateIdKeyIntoObject,
-  getBatchToken
 };

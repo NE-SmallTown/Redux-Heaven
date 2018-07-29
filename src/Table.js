@@ -45,6 +45,10 @@ export default class Table {
     this.$$typeof = SYMBOL_TABLE;
     this.ids = [];
     this.itemsById = {};
+    this.localState = {
+      ids      : this.ids,
+      itemsById: this.itemsById
+    };
 
     Object.assign(this, DEFAULT_TABLE_ATTRIBUTES, userAttributes);
   }
@@ -58,11 +62,7 @@ export default class Table {
   };
 
   get state () {
-    // eslint-disable-next-line
-    return this.state || (this.state = {
-      ids      : this.ids,
-      itemsById: this.itemsById
-    });
+    return this.localState;
   }
 
   makeStateShallowMergeItSelf () {
@@ -80,7 +80,6 @@ export default class Table {
 
   // insert 对于 id 已存在的情况会抛错，如果对于 id 已存在的情况想进行更新，请调用 upsert 方法
   insert (item, { batchToken }) {
-    return new Promise((resolve, reject) => {
       const itemId = this.getItemId(item);
 
       if (!this.hasId(itemId)) {
@@ -88,12 +87,9 @@ export default class Table {
         this.itemsById = ops.batch.merge(batchToken, { [itemId]: item }, this.itemsById);
 
         this.makeStateShallowMergeItSelf();
-
-        resolve();
       } else {
-        reject(new Error(`Insert error: the item of ${this.idAttribute}(${itemId}) has existed in the ${this.constructor.name} Table`));
+        new Error(`Insert error: the item of ${this.idAttribute}(${itemId}) has existed in the ${this.constructor.name} Table`);
       }
-    });
   }
 
   // create or update

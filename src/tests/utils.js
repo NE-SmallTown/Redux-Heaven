@@ -16,8 +16,8 @@ const RepliesMock = [{
   'id'             : '450000200402084754',
   'commentCount'   : 2,
   'praiseCount'    : 35,
-  'excerpt'        : '下目眼候收约眼志将种报身拉什我日角。据治老响本总同周数志该该必行行......',
-  'content'        : '下目眼候收约眼志将种报身拉什我日角。据治老响本总同周数志该该必行行合最习。除情工金被道么型指在了都较存质转。程求理效情可类南角极节素。小约市个转应期社周被素。<br><br>',
+  'excerpt'        : '下目眼候收约眼志将种报身拉什我日......',
+  'content'        : '下目眼候收约眼志将种报身拉什我日角。据治老响本总同周数志该该必行行合最习。除情工金被道么型指<br><br>',
   'createdTime'    : '1998-09-30 16:12:59',
   'lastUpdatedTime': '1975-04-14 18:48:59',
   'author'         : {
@@ -131,72 +131,103 @@ const UsersMock = [{
   'userToken': 'wpqxherlqjxvilgarfdsomgearfqjh'
 }];
 
-const hobbyMock = [
-  {
-    id: '23',
-    name: 'Biography'
-  },
-  {
-    id: '2',
-    name: 'Autobiography'
-  },
-  {
-    id: '454',
-    name: 'Software Development'
-  },
-  {
-    id: '56',
-    name: 'Redux'
-  }
-];
-
 export function createTestModels () {
   const Website = class WebsiteModel extends Model {
     static modelName = 'Website';
 
-    static get fields () {
-      return {
-        id        : attr(),
-        name      : attr(),
-        pagination: oneToOne('Pagination', 'host')
-      };
+    static fields = {
+      id : attr(),
+      navbar: attr(),
+      feeds: fk(({ type }) => {
+        switch (type) {
+          case 'question':
+            return ['Question', 'userRecommandQuestions'];
+          case 'question-answer':
+            return ['QAnswer', 'userRecommandQuestionsAndAnswers'];
+          case 'Topic':
+            return ['Topic', 'userRecommandTopics'];
+          case 'Ad':
+            return ['Ad', 'userRecommandAds'];
+          default:
+            throw Error(`No model for type: ${type}`);
+        } 
+      })
+    };
+  };
+  
+  const Question = class Question extends Model {
+    static modelName = 'Question';
+    
+    static fields = {
+      id: attr(),
+      title: attr(),
+      description: attr(),
+      author: fk('User', 'questions'),
+      answers: fk('Answer', 'question')
     }
   };
-
-  const Reply = class ReplyModel extends Model {
+  
+  const Answer = class Answer extends Model {
+    static modelName = 'Answer';
+    
+    static fields = {
+      id: attr(),
+      // we have defined the 'answers: fk('Answer', 'question')' fk in Question Model
+      // so we don't need to define it again
+      // question: fk('Question', 'replies'),
+      author: fk('User', 'answers'),
+      commentCount: attr(),
+      content: attr(),
+      createdTime: attr(),
+      excerpt: attr(),
+      lastUpdatedTime: attr(),
+      praiseCount: attr(),
+      pagination: oneToOne('Pagination', 'reply')
+    }
+  };
+  
+  const QAnswer = class QAnswer extends Model {
+    static modelName = 'QAnswer';
+    
+    static fields = {
+      id: attr(),
+      question: oneToOne('Question', 'qAnswer'),
+      answer: fk('Answer', 'qAnswer')
+    }
+  };
+  
+  const Topic = class Topic extends Model {
     static modelName = 'Reply';
-
-    static get fields () {
-      return {
-        id             : attr(),
-        name           : attr(),
-        host           : fk('Host', 'replies'),
-        author         : fk('User', 'replies'),
-        commentCount   : attr(),
-        content        : attr(),
-        createdTime    : attr(),
-        excerpt        : attr(),
-        lastUpdatedTime: attr(),
-        praiseCount    : attr(),
-        pagination     : oneToOne('Pagination', 'reply')
-      };
+    
+    static fields = {
+      id: attr(),
+      title: attr(),
+      followers: many('User', 'followedTopics'),
+      questions: many('Question', 'topics')
+    }
+  };
+  
+  const Ad = class Ad extends Model {
+    static modelName = 'Ad';
+    
+    static fields = {
+      id: attr(),
+      title: attr(),
+      coverUrl: attr()
     }
   };
 
   const Pagination = class PaginationModel extends Model {
     static modelName = 'Pagination';
 
-    static get fields () {
-      return {
-        id         : attr(),
-        name       : attr(),
-        currentPage: attr(),
-        pageSize   : attr(),
-        totalCount : attr()
-      };
+    static fields = {
+      id: attr(),
+      name: attr(),
+      currentPage: attr(),
+      pageSize: attr(),
+      totalCount: attr()
     }
   };
-  Pagination.modelName = 'Pagination';
 
   const Comment = class CommentModel extends Model {
     static modelName = 'Comment';
@@ -204,7 +235,7 @@ export function createTestModels () {
     static fields = {
       id         : attr(),
       name       : attr(),
-      reply      : fk('Reply', 'comments'),
+      reply      : fk('Answer', 'comments'),
       author     : fk('User', 'comments'),
       content    : attr(),
       createdTime: attr(),
@@ -224,17 +255,7 @@ export function createTestModels () {
       roleName : attr(),
       userId   : attr(),
       userName : attr(),
-      userToken: attr(),
-      hobbies:  many('Hobby', 'followers')
-    };
-  };
-
-  const Hobby = class HobbyModel extends Model {
-    static modelName = 'Hobby';
-
-    static fields = {
-      id       : attr(),
-      name     : attr()
+      userToken: attr()
     };
   };
 
@@ -243,8 +264,7 @@ export function createTestModels () {
     Reply,
     Pagination,
     Comment,
-    User,
-    Hobby
+    User
   };
 }
 
@@ -255,33 +275,31 @@ export function createTestORM (customModels) {
     Reply,
     Pagination,
     Comment,
-    User,
-    Hobby
+    User
   } = models;
 
   const orm = new ORM();
-  orm.register(Website, Reply, Pagination, Comment, User, Hobby);
+  orm.register(Website, Reply, Pagination, Comment, User);
   return orm;
 }
 
 export function createTestSession () {
   const orm = createTestORM();
-  return orm.session(orm.getEmptytate());
+  return orm.initSession(orm.getEmptytate());
 }
 
 export function createTestSessionWithData (customORM) {
   const orm = customORM || createTestORM();
   const state = orm.getEmptyState();
-  const { Website, Reply, Pagination, Comment, User, Hobby } = orm.mutableSession(state);
+  const { Website, Reply, Pagination, Comment, User } = orm.mutableSession(state);
 
   WebsitesMock.forEach(props => Website.create(props));
   RepliesMock.forEach(props => Reply.create(props));
   PaginationsMock.forEach(props => Pagination.create(props));
   CommentsMock.forEach(props => Comment.create(props));
   UsersMock.forEach(props => User.create(props));
-  hobbyMock.forEach(props => Hobby.create(props));
 
-  const normalSession = orm.session(state);
+  const normalSession = orm.initSession(state);
   return { session: normalSession, orm, state };
 }
 

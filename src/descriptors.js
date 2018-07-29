@@ -110,7 +110,6 @@ const manyToManyDescriptor = memoize((
       toModelName = temp2.modelName;
     }
 
-    // TODO 感觉不应该定义成 descriptor 的 get，直接在原型上赋值 author 的时候赋值 id 而不是对象不就好了吗？
     // 当像 article.author 这样访问的时候
     // 需要在 Article-User 这个中间表中找到 articleId 等于 article.id 的那一行或者多行，比如 article.id = 3
     const throughQs = throughModel.filter(lookupObj);

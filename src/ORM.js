@@ -4,24 +4,8 @@ import find from 'lodash/find';
 import Session from './Session';
 import Model from './Model';
 import { createDatabase as defaultcreateDatabase } from './dataBase';
-import {
-  ForeignKey,
-  ManyToMany,
-  attr
-} from './fields';
-
-import {
-  createReducer,
-  createSelector
-} from './redux';
-
-import {
-  m2mName,
-  attachQuerySetMethods,
-  m2mToFieldName,
-  m2mFromFieldName,
-  warnDeprecated
-} from './utils';
+import { ForeignKey, ManyToMany, attr } from './fields';
+import { m2mName, attachQuerySetMethods, m2mToFieldName, m2mFromFieldName } from './utils';
 
 const ORM_DEFAULTS = {
   createDatabase: defaultcreateDatabase
@@ -163,11 +147,13 @@ export const ORM = class ORM {
     const models = this.getModelClasses();
     const tables = models.reduce((spec, modelClass) => {
       const tableName = modelClass.modelName;
-      const tableSpec = modelClass._getTableOpts(); // eslint-disable-line no-underscore-dangle
-      spec[tableName] = Object.assign({}, { fields: modelClass.fields }, tableSpec);
+      
+      spec[tableName] = { fields: modelClass.fields }
+      
       return spec;
     }, {});
-
+  
+    // tables 为 { Article: { fields: Article.fields } }
     return { tables };
   }
 
@@ -175,6 +161,7 @@ export const ORM = class ORM {
     if (!this.db) {
       this.db = this.createDatabase(this.generateSchemaSpec());
     }
+    
     return this.db;
   }
 
@@ -183,7 +170,7 @@ export const ORM = class ORM {
      * @return {Object} the empty state
      */
   getEmptyState () {
-    return this.getDatabase().getEmptyState();
+    return this.getDatabase().getState();
   }
 
   /**
@@ -192,7 +179,7 @@ export const ORM = class ORM {
      * @param  {Object} state  - the state the database manages
      * @return {Session} a new {@link Session} instance
      */
-  session (state) {
+  initSession (state) {
     return new Session(this, this.getDatabase(), state);
   }
 

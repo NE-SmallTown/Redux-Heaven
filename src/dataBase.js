@@ -22,11 +22,14 @@ function replaceTableState (tableName, newTableState, tx, state) {
   return ops.batch.set(batchToken, tableName, newTableState, state);
 }
 
-function execute (tables, executeSpec, tx, state) {
-  const { action, payload, table: tableName, query: querySpec, clauses } = executeSpec;
+// table 如 { Article: tableInstance, User: tableInstance }
+// executeSpec 如 { action: CREATE, table: 'Article', payload: ret }
+// tx = { batchToken, withMutations }
 
+// tables 即包含的预先定义好的表，也包含了所有的中间表
+function execute (tables, executeSpec, tx, state) {
+  const { action, payload, table: tableName, clauses } = executeSpec;
   const table = tables[tableName];
-  const currTableState = state[tableName];
   let nextTableState;
   let resultPayload;
 
@@ -41,7 +44,7 @@ function execute (tables, executeSpec, tx, state) {
     }
     case CREATE:
     {
-      table.insert(tx, currTableState, payload);
+      table.insert(payload, tx);
 
       nextTableState = table.state;
       resultPayload = payload;
@@ -66,6 +69,7 @@ function execute (tables, executeSpec, tx, state) {
   }
 
   const nextDBState = replaceTableState(tableName, nextTableState, tx, state);
+  
   return {
     status: SUCCESS,
     state: nextDBState,
@@ -74,8 +78,9 @@ function execute (tables, executeSpec, tx, state) {
 }
 
 export const createDatabase = schemaSpec => {
-  const { tables: tablesSpec } = schemaSpec;
-  const tables = mapValues(tablesSpec, tableSpec => new Table(tableSpec));
+  // 将 { tables: { Article: { fields: Article.fields }, User: { fields: User.fields } } } 转化为
+  // { Article: tableInstance, User: tableInstance }
+  const tables = mapValues(schemaSpec.tables, tableSpec => new Table(tableSpec));
 
   return {
     getState: () => mapValues(tables, table => table.state),
@@ -83,11 +88,12 @@ export const createDatabase = schemaSpec => {
       return tables.reduce((ret, table) => {
         const tableClass = table.constructor;
         if (typeof tableClass.reducer !== 'function') {
-          throw Error(`there is no static reducer function in class(${tableClass.name})`);
+          throw Error(`there is no static reducer function in the table: (${tableClass.name})`);
         } else {
           tableClass.reducer(state, action, tableClass);
         }
       }, {});
-    }
+    },
+    execute: (...args) => execute(tables, ...args)
   };
 };

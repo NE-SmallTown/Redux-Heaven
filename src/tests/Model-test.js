@@ -10,7 +10,6 @@ describe('Model', () => {
   describe('Normal create', () => {
     beforeEach(() => {
       // Deep freeze state. This will raise an error if we mutate the state.
-
       ({
         session,
         orm,
@@ -59,7 +58,7 @@ describe('Model', () => {
       const _orm = new ORM();
       _orm.register(DefaultFieldModel);
 
-      const _session = _orm.session(_orm.getEmptyState());
+      const _session = _orm.initSession(_orm.getEmptyState());
       _session.DefaultFieldModel.create({});
 
       expect(_session.DefaultFieldModel.hasId(1)).toBe(true);
@@ -98,7 +97,7 @@ describe('Model', () => {
 
       orm = new ORM();
       orm.register(User, Team);
-      session = orm.session(orm.getEmptyState());
+      session = orm.initSession(orm.getEmptyState());
 
       session.Team.create({ name: 'team0' });
       session.Team.create({ name: 'team1' });
@@ -272,7 +271,7 @@ describe('Model', () => {
 
       orm = new ORM();
       orm.register(UserModel, TeamModel, User2TeamModel);
-      session = orm.session(orm.getEmptyState());
+      session = orm.initSession(orm.getEmptyState());
       const { User, Team, User2Team } = session;
 
       Team.create({ id: 't0', name: 'team0' });
@@ -313,7 +312,7 @@ describe('Model', () => {
 
       orm = new ORM();
       orm.register(UserModel, TeamModel, User2TeamModel);
-      session = orm.session(orm.getEmptyState());
+      session = orm.initSession(orm.getEmptyState());
       const { User, Team, User2Team } = session;
 
       Team.create({ id: 't0', name: 'team0' });
@@ -354,7 +353,7 @@ describe('Model', () => {
 
       orm = new ORM();
       orm.register(UserModel, TeamModel, User2TeamModel);
-      session = orm.session(orm.getEmptyState());
+      session = orm.initSession(orm.getEmptyState());
       const { User, Team, User2Team } = session;
 
       Team.create({ id: 't0', name: 'team0' });

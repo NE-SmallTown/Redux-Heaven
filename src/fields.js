@@ -218,7 +218,7 @@ export class ManyToMany extends RelationalField {
       };
     }
     
-    // 重新定义 Article model 上的 author 字段，使其不再是一个对象或者对象数组，而是一个 id 或者 id 数组
+    // 定义 forward 字段，重新定义 Article model 上的 author 字段，使其不再是一个对象或者对象数组，而是一个 id 数组
     Object.defineProperty(
       model.prototype, // Article.prototype
       fieldName, // author
