@@ -7,82 +7,440 @@ import { fk, many, oneToOne, attr } from '../fields';
  * The schema is simple but covers most relational cases:
  * foreign keys, one-to-ones, many-to-many's, named reverse relations.
  */
+ 
+// Mock.mock({
+//   'array|10-20': [
+//     {
+//       userId: Random.id(),
+//       userName: Random.cname(),
+//       loginName: Random.name(),
+//       avatarUrl: Random.image(),
+//       'roleName|1': ['normal', 'vip', 'supervip', 'blacklist'] }
+//   ]
+// });
+const UsersMock = [
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'blacklist'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'vip'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'normal'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'vip'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'blacklist'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'vip'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'supervip'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'normal'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'normal'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'blacklist'
+  },
+  {
+    userId: '510000200404154433',
+    userName: '姚杰',
+    loginName: 'Thomas Davis',
+    avatarUrl: 'http://dummyimage.com/300x600',
+    roleName: 'supervip'
+  }
+];
+
+const getRandomUser = () => UsersMock[Math.floor(Math.random() * UsersMock.length)];
+
+// Mock.mock({
+//   'array|10-20': [
+//     {
+//       id: Random.id(),
+//       currentPage: Random.integer(20),
+//       pageSize: Random.integer(15),
+//       totalCount: Random.integer(100)
+//     }
+//   ]
+// });
+const PaginationMock = [
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  },
+  {
+    id: '320000199904285105',
+    currentPage: 5887860885132921,
+    pageSize: 1107218406689147,
+    totalCount: 2635285547160895
+  }
+];
+
+const getRandomPagination = () => PaginationMock[Math.floor(Math.random() * PaginationMock.length)];
 
 const WebsitesMock = {
   id: '110000199803245551'
 };
 
-const AnswerMock = [{
-  'id'             : '450000200402084754',
-  'commentCount'   : 2,
-  'praiseCount'    : 35,
-  'excerpt'        : '下目眼候收约眼志将种报身拉什我日......',
-  'content'        : '下目眼候收约眼志将种报身拉什我日角。据治老响本总同周数志该该必行行合最习。除情工金被道么型指<br><br>',
-  'createdTime'    : '1998-09-30 16:12:59',
-  'lastUpdatedTime': '1975-04-14 18:48:59',
-  'author'         : {
-    'userName' : '张娟',
-    'loginName': 'Margaret',
-    'avatarUrl': 'http://obkwh871t.bkt.clouddn.com/images/12928.jpg',
-    'userId'   : '540000198106213293',
-    'roleName' : 'blacklist'
+// Mock.mock({
+//   'array|10-20': [
+//     {
+//       id: Random.id(),
+//       commentCount: Random.integer(0, 1000),
+//       content: Random.cparagraph(5),
+//       createdTime: Random.time('T'),
+//       excerpt: Random.word(20),
+//       lastUpdatedTime: Random.time('T'),
+//       praiseCount: Random.integer(0, 1000),
+//       author: getRandomUser(),
+//       pagination: getRandomPagination()
+//     }]
+// });
+const AnswerMock = [
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
-  'needCollapse'   : true
-}, {
-  'id'             : '410000197701068314',
-  'commentCount'   : 17,
-  'praiseCount'    : 91,
-  'excerpt'        : '素区金常片后参下老个取关美设......',
-  'content'        : '素区金常片后参下老个取关美设断必然。单消和因里向还声响第次级事',
-  'createdTime'    : '1975-09-26 16:12:59',
-  'lastUpdatedTime': '2009-05-20 18:47:59',
-  'author'         : {
-    'userName' : 'Brian Williams',
-    'loginName': 'Betty',
-    'avatarUrl': 'http://obkwh871t.bkt.clouddn.com/images/12936.jpg',
-    'userId'   : '820000200002061886',
-    'roleName' : 'blacklist'
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
-  'needCollapse'   : true
-}, {
-  'id'             : '12000020091211307X',
-  'commentCount'   : 3,
-  'praiseCount'    : 8,
-  'excerpt'        : '层要系需头类酸二建片为须确式物平。指影造王层规新气过表局包装。划需平家真将信传观但江品般......',
-  'content'        : '层要系需头类酸二建片为须确式物平。指影造王层规新气过表局包装。划需平家真将信传观但江品般后。开快在产际确都二保置说',
-  'createdTime'    : '1979-06-23 16:12:59',
-  'lastUpdatedTime': '2006-06-24 20:25:59',
-  'author'         : {
-    'userName' : 'Shirley Taylor',
-    'loginName': 'Angela',
-    'avatarUrl': 'http://obkwh871t.bkt.clouddn.com/images/12928.jpg',
-    'userId'   : '37000020021103755X',
-    'roleName' : 'blacklist'
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
-  'needCollapse'   : true
-}];
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  },
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  },
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  },
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  },
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  },
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  },
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  },
+  {
+    id: '530000199701080096',
+    commentCount: 210,
+    content:
+      '门劳说指得万性织天军青劳。商身权般音边带律来大作精位公性选真。般展美采果信拉市民断民五习受。斯风九西别表物石能或细者建证计。名少始分江际通先着基断更名的书种响。',
+    createdTime: '533000328586',
+    excerpt: 'pvgcpdexfouwjyxuzlsx',
+    lastUpdatedTime: '1017872035930',
+    praiseCount: 409,
+    author: getRandomUser(),
+    pagination: getRandomPagination()
+  }
+];
 
-const PaginationsMock = [
+const getRandomAnswers = () => AnswerMock.slice(0, Math.floor(Math.random() * AnswerMock.length));
+
+// JSON.stringify(Mock.mock({
+//   'array|10-20': [{
+//     id: Random.id(),
+//     title: Random.title(),
+//     description: Random.sentence(5),
+//     author: getRandomUser(),
+//     answers: getRandomAnswers()
+//   }]
+// }));
+const QuestionMock = [
   {
-    id         : '1321312',
-    name       : 'dsfsd',
-    currentPage: 1,
-    pageSize   : 10,
-    totalCount : 13
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
   },
   {
-    id         : '64564',
-    name       : 'vnvbn',
-    currentPage: 2,
-    pageSize   : 20,
-    totalCount : 150
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
   },
   {
-    id         : '234234',
-    name       : 'ytut',
-    currentPage: 4,
-    pageSize   : 10,
-    totalCount : 25
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
+  },
+  {
+    id: '630000200208238880',
+    title: 'Lxqwu Mevgyhliti Rtqdsnelcr Giymisd Anif',
+    description: 'Jrb buadgugyf epppijm mdt exdzomivf.',
+    author: getRandomUser(),
+    answers: getRandomAnswers()
   }
 ];
 
@@ -108,41 +466,85 @@ const CommentsMock = [{
   }
 }];
 
-const UsersMock = [{
-  'userName' : 'Cynthia Harris',
-  'loginName': 'Jennifer',
-  'avatarUrl': 'http://obkwh871t.bkt.clouddn.com/images/12938.jpg',
-  'userId'   : '360000197312150846',
-  'roleName' : 'vip',
-  'userToken': 'cxgcidxhqlvkfdswpbdoebdmgvezyt'
-}, {
-  'userName' : '阎静',
-  'loginName': 'Eric',
-  'avatarUrl': 'http://obkwh871t.bkt.clouddn.com/images/12933.jpg',
-  'userId'   : '210000197406172349',
-  'roleName' : 'vip',
-  'userToken': 'yqxdpprkmnjvxljqfoycgjyvyowjov'
-}, {
-  'userName' : '龚平',
-  'loginName': 'Anthony',
-  'avatarUrl': 'http://obkwh871t.bkt.clouddn.com/images/12933.jpg',
-  'userId'   : '510000199906230429',
-  'roleName' : 'vip',
-  'userToken': 'wpqxherlqjxvilgarfdsomgearfqjh'
-}];
+// Mock.mock({
+//   'array|5-10': [
+//     {
+//       'id': Random.id(),
+//       'title': Random.title(),
+//       'coverUrl': Random.url(),
+//       investors: Random.name() }
+//   ]
+// });
+const AdMock = [
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  },
+  {
+    id: '630000199211149349',
+    title: 'Hrl Eetpadcqtn Gtchfvrv Lpxzh Tnzmupsiys Bpcdtjyxi Bxhndvrl',
+    coverUrl: 'rlogin://lrtd.na/xzat',
+    investors: 'Jennifer Taylor'
+  }
+];
 
-const AdMock = [{
-  id: '2323',
-  title: 'afdfd',
-  coverUrl: 'http://wew',
-  investors: 'qwewq'
-}];
 const TopicMock = [{
   id: '12321',
   title: '123',
-  followers: [],
-  questions: []
+  followers: UsersMock.slice(2, 5),
+  questions: Que
 }];
+
 const QAnswerMock = [{
   id: '21321',
   question: {},
@@ -180,7 +582,7 @@ export function createTestModels () {
       id: attr(),
       title: attr(),
       description: attr(),
-      author: fk('User', 'questions'),
+      author: oneToOne('User', 'questions'),
       answers: fk('Answer', 'question')
     }
   };
@@ -241,7 +643,6 @@ export function createTestModels () {
 
     static fields = {
       id: attr(),
-      name: attr(),
       currentPage: attr(),
       pageSize: attr(),
       totalCount: attr()
@@ -253,7 +654,6 @@ export function createTestModels () {
 
     static fields = {
       id: attr(),
-      name: attr(),
       answer: fk('Answer', 'comments'),
       author: fk('User', 'comments'),
       content: attr(),
@@ -272,13 +672,13 @@ export function createTestModels () {
       loginName: attr(),
       roleName: attr(),
       userId: attr(),
-      userName: attr(),
-      userToken: attr()
+      userName: attr()
     };
   };
 
   return {
     Website,
+    Question,
     Answer,
     Pagination,
     Comment,
