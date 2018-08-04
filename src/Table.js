@@ -38,7 +38,6 @@ const DEFAULT_TABLE_ATTRIBUTES = {
   candidateIdKes: ['id'] // 这些里面的都有可能是 id，如 ['user_id', 'user_id', 'author_id'] 最终都会转化为 id 存储在 table 上
 };
 
-// TODO 数据库操作目前都使用的同步带 Promise，目的是为了将来可能的异步扩展
 // 到时候只需要在异步完成的时候再 dispatch 一个 action 就行了
 export default class Table {
   constructor (userAttributes) {
@@ -80,16 +79,16 @@ export default class Table {
 
   // insert 对于 id 已存在的情况会抛错，如果对于 id 已存在的情况想进行更新，请调用 upsert 方法
   insert (item, { batchToken }) {
-      const itemId = this.getItemId(item);
+    const itemId = this.getItemId(item);
 
-      if (!this.hasId(itemId)) {
-        this.ids = ops.batch.push(batchToken, itemId, this.ids);
-        this.itemsById = ops.batch.merge(batchToken, { [itemId]: item }, this.itemsById);
+    if (!this.hasId(itemId)) {
+      this.ids = ops.batch.push(batchToken, itemId, this.ids);
+      this.itemsById = ops.batch.merge(batchToken, { [itemId]: item }, this.itemsById);
 
-        this.makeStateShallowMergeItSelf();
-      } else {
-        new Error(`Insert error: the item of ${this.idAttribute}(${itemId}) has existed in the ${this.constructor.name} Table`);
-      }
+      this.makeStateShallowMergeItSelf();
+    } else {
+      new Error(`Insert error: the item of ${this.idAttribute}(${itemId}) has existed in the ${this.constructor.name} Table`);
+    }
   }
 
   // create or update

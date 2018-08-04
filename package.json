@@ -39,10 +39,6 @@
   },
   "homepage": "https://github.com/NE-SmallTown/redux-Heaven",
   "license": "MIT License",
-  "peerDependencies": {
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0"
-  },
   "dependencies": {
     "lodash": "^4.17.4",
     "redux": "^3.6.0",
@@ -118,6 +114,7 @@
     "webpack": "^3.5.6",
     "webpack-dev-middleware": "^1.12.0",
     "webpack-hot-middleware": "^2.19.1",
-    "yargs": "^6.3.0"
+    "yargs": "^6.3.0",
+    "lint-staged": "^7.2.0"
   }
 }

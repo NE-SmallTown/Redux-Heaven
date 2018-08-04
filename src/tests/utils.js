@@ -12,7 +12,7 @@ const WebsitesMock = {
   id: '110000199803245551'
 };
 
-const RepliesMock = [{
+const AnswerMock = [{
   'id'             : '450000200402084754',
   'commentCount'   : 2,
   'praiseCount'    : 35,
@@ -131,6 +131,24 @@ const UsersMock = [{
   'userToken': 'wpqxherlqjxvilgarfdsomgearfqjh'
 }];
 
+const AdMock = [{
+  id: '2323',
+  title: 'afdfd',
+  coverUrl: 'http://wew',
+  investors: 'qwewq'
+}];
+const TopicMock = [{
+  id: '12321',
+  title: '123',
+  followers: [],
+  questions: []
+}];
+const QAnswerMock = [{
+  id: '21321',
+  question: {},
+  answer: []
+}];
+
 export function createTestModels () {
   const Website = class WebsiteModel extends Model {
     static modelName = 'Website';
@@ -182,7 +200,7 @@ export function createTestModels () {
       excerpt: attr(),
       lastUpdatedTime: attr(),
       praiseCount: attr(),
-      pagination: oneToOne('Pagination', 'reply')
+      pagination: oneToOne('Pagination', 'answers')
     }
   };
   
@@ -213,7 +231,8 @@ export function createTestModels () {
     static fields = {
       id: attr(),
       title: attr(),
-      coverUrl: attr()
+      coverUrl: attr(),
+      investors: attr()
     }
   };
 
@@ -233,14 +252,14 @@ export function createTestModels () {
     static modelName = 'Comment';
 
     static fields = {
-      id         : attr(),
-      name       : attr(),
-      reply      : fk('Answer', 'comments'),
-      author     : fk('User', 'comments'),
-      content    : attr(),
+      id: attr(),
+      name: attr(),
+      answer: fk('Answer', 'comments'),
+      author: fk('User', 'comments'),
+      content: attr(),
       createdTime: attr(),
-      isAuthor   : attr(),
-      replyTo    : fk('User', 'replyToMe')
+      isAuthor: attr(),
+      replyTo: fk('User', 'replyToMe')
     };
   };
 
@@ -248,56 +267,53 @@ export function createTestModels () {
     static modelName = 'User';
 
     static fields = {
-      id       : attr(),
-      name     : attr(),
+      id: attr(),
       avatarUrl: attr(),
       loginName: attr(),
-      roleName : attr(),
-      userId   : attr(),
-      userName : attr(),
+      roleName: attr(),
+      userId: attr(),
+      userName: attr(),
       userToken: attr()
     };
   };
 
   return {
     Website,
-    Reply,
+    Answer,
     Pagination,
     Comment,
-    User
+    User,
+    Ad,
+    Topic,
+    QAnswer
   };
 }
 
-export function createTestORM (customModels) {
-  const models = customModels || createTestModels();
-  const {
-    Website,
-    Reply,
-    Pagination,
-    Comment,
-    User
-  } = models;
+export function createTestORM (models = createTestModels()) {
+  const { Website, Reply, Pagination, Comment, User } = models;
 
   const orm = new ORM();
   orm.register(Website, Reply, Pagination, Comment, User);
+  
   return orm;
 }
 
-export function createTestSession () {
-  const orm = createTestORM();
-  return orm.initSession(orm.getEmptytate());
-}
-
-export function createTestSessionWithData (customORM) {
-  const orm = customORM || createTestORM();
+export function createTestSessionWithData (orm = createTestORM()) {
   const state = orm.getEmptyState();
-  const { Website, Reply, Pagination, Comment, User } = orm.mutableSession(state);
+  const { Website, Answer, Pagination, Comment, User, Ad, Topic, QAnswer } = orm.mutableSession(state);
 
-  WebsitesMock.forEach(props => Website.create(props));
-  RepliesMock.forEach(props => Reply.create(props));
-  PaginationsMock.forEach(props => Pagination.create(props));
-  CommentsMock.forEach(props => Comment.create(props));
-  UsersMock.forEach(props => User.create(props));
+  [
+    [WebsitesMock, Website], 
+    [AnswerMock, Answer],
+    [PaginationsMock, Pagination],
+    [CommentsMock, Comment],
+    [UsersMock, User],
+    [AdMock, Ad],
+    [TopicMock, Topic],
+    [QAnswerMock, QAnswer]
+  ].forEach(([mockDataArr, mockModel]) =>
+    mockDataArr.forEach(mockData => mockModel.create(mockData))
+  );
 
   const normalSession = orm.initSession(state);
   return { session: normalSession, orm, state };

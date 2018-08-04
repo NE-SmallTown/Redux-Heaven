@@ -91,11 +91,11 @@ const manyToManyDescriptor = memoize((
   reverse
 ) => ({
   get () {
-    let {[fromModelName]: fromModel, [toModelName]: toModel, [throughModelName]: throughModel} = this.getClass().session;
+    let { [fromModelName]: fromModel, [toModelName]: toModel, [throughModelName]: throughModel } = this.getClass().session;
     let fromFieldName = throughFields.from; // 如 articleId
     let toFieldName = throughFields.to; // 如 'userId'
     const thisId = this.getId(); // userProps 里 id 的值
-    const lookupObj = {[fromFieldName]: thisId};
+    const lookupObj = { [fromFieldName]: thisId };
     
     if (reverse) {
       lookupObj[toFieldName] = thisId;
@@ -123,7 +123,7 @@ const manyToManyDescriptor = memoize((
     // 给 article.author 添加作者
     qs.add = function add (addedArr) {
       if (isPlainObject(addedArr)) {
-        addedArr = [addedArr]
+        addedArr = [addedArr];
       } else if (!isArray(addedArr)) {
         throw Error(`Added value must be an object/array, but passed in ${addedArr}`);
       }
@@ -145,8 +145,8 @@ const manyToManyDescriptor = memoize((
       // 如果结果里面已经有新添加的作者了，那么只需要在中间表中增加记录即可，否则还需要在 toModel 中创建记录
       // 先在对应的表（如 User）中创建记录
       addedArr
-      .filter(v => !existingIds.includes(v[toModel.idAttribute]))
-      .forEach(item => toModel.create(item));
+        .filter(v => !existingIds.includes(v[toModel.idAttribute]))
+        .forEach(item => toModel.create(item));
       
       // 然后在中间表（如 Article-User）中创建记录
       idsToAdd.forEach(id => {

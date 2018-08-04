@@ -89,35 +89,35 @@ class RelationalField {
     }
   }
   
-  get toModelName() {
+  get toModelName () {
     if (this.lazy) {
       if (!this.userProps) {
-        throw Error(`Can't find userProps in field instance when get toModelName, please file an issue!`)
+        throw Error(`Can't find userProps in field instance when get toModelName, please file an issue!`);
       }
       
-      return this.localToModelName(this.userProps)[0]
+      return this.localToModelName(this.userProps)[0];
     }
     
     return this.localToModelName;
   }
   
-  set toModelName(v) {
+  set toModelName (v) {
     this.localToModelName = v;
   }
   
-  get fieldKeyInToMoel() {
+  get fieldKeyInToMoel () {
     if (this.lazy) {
       if (!this.userProps) {
-        throw Error(`Can't find userProps in field instance when get fieldKeyInToMoel, please file an issue!`)
+        throw Error(`Can't find userProps in field instance when get fieldKeyInToMoel, please file an issue!`);
       }
       
-      return this.localToModelName(this.userProps)[1]
+      return this.localToModelName(this.userProps)[1];
     }
     
     return this.localFieldKeyInToMoel;
   }
   
-  set fieldKeyInToMoel(v) {
+  set fieldKeyInToMoel (v) {
     this.localFieldKeyInToMoel = v;
   }
 

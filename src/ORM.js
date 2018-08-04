@@ -29,7 +29,7 @@ export const ORM = class ORM {
      * Creates a new ORM instance.
      */
   constructor (opts = {}) {
-    const { createDatabase } = {...ORM_DEFAULTS, ...opts};
+    const { createDatabase } = { ...ORM_DEFAULTS, ...opts };
     this.createDatabase = createDatabase;
     this.registry = [];
     this.implicitThroughModels = [];
@@ -37,23 +37,20 @@ export const ORM = class ORM {
   }
 
   /**
-   * Registers a {@link Model} class to the ORM.
+   * Registers Model to the ORM.
    *
    * If the model has declared any ManyToMany fields, their
    * through models will be generated and registered with
    * this call, unless a custom through model has been specified.
    *
    * @param  {...Model} models - a {@link Model} class to register
-   * @return {undefined}
    */
-  register (...models) {
-    models.forEach(model => {
-      model.resetClassCache();
-      model.setOrm(this);
+  register = (...models) => models.forEach(model => {
+    model.resetClassCache();
+    model.setOrm(this);
 
-      this.registry.push(model);
-    });
-  }
+    this.registry.push(model);
+  });
 
   registerManyToManyModelsFor (model, userProps) {
     const fields = model.fields;
@@ -63,8 +60,7 @@ export const ORM = class ORM {
       if (fieldInstance instanceof ManyToMany && !fieldInstance.through) {
         const toModelName = fieldInstance.lazy
           ? fieldInstance.toModelName(userProps)[0] : fieldInstance.toModelName;
-
-        // TODO 感觉可以完全消除中间表
+        
         class ThroughModel extends Model {
           // 如 thisModelName = 'Article', toModelName = 'User', 所以结果为 'Article-User'
           static modelName = m2mName(thisModelName, toModelName);
@@ -109,11 +105,9 @@ export const ORM = class ORM {
     return this.registry.concat(this.implicitThroughModels);
   }
 
-  isFieldInstalled (modelName, fieldName) {
-    return this.installedFields.hasOwnProperty(modelName)
-      ? !!this.installedFields[modelName][fieldName]
-      : false;
-  }
+  isFieldInstalled = (modelName, fieldName) => this.installedFields.hasOwnProperty(modelName)
+    ? !!this.installedFields[modelName][fieldName]
+    : false;
 
   setFieldInstalled (modelName, fieldName) {
     if (!this.installedFields.hasOwnProperty(modelName)) {
@@ -132,8 +126,8 @@ export const ORM = class ORM {
             // lazy 的话由于需要 userProps 来判断到底 fk 或者 many 的 toModelName 是什么
             // 所以放在 create 的时候再去 install
             if (!fieldInstance.lazy) {
-                fieldInstance.install(model, fieldName, fieldInstance, this);
-                this.setFieldInstalled(model.modelName, fieldName);
+              fieldInstance.install(model, fieldName, fieldInstance, this);
+              this.setFieldInstalled(model.modelName, fieldName);
             }
           }
         });
@@ -148,7 +142,7 @@ export const ORM = class ORM {
     const tables = models.reduce((spec, modelClass) => {
       const tableName = modelClass.modelName;
       
-      spec[tableName] = { fields: modelClass.fields }
+      spec[tableName] = { fields: modelClass.fields };
       
       return spec;
     }, {});
@@ -157,21 +151,19 @@ export const ORM = class ORM {
     return { tables };
   }
 
-  getDatabase () {
+  getDatabase = () => {
     if (!this.db) {
       this.db = this.createDatabase(this.generateSchemaSpec());
     }
     
     return this.db;
-  }
+  };
 
   /**
      * Returns the empty database state.
      * @return {Object} the empty state
      */
-  getEmptyState () {
-    return this.getDatabase().getState();
-  }
+  getEmptyState = () => this.getDatabase().getState();
 
   /**
      * Begins an immutable database session.
@@ -179,9 +171,7 @@ export const ORM = class ORM {
      * @param  {Object} state  - the state the database manages
      * @return {Session} a new {@link Session} instance
      */
-  initSession (state) {
-    return new Session(this, this.getDatabase(), state);
-  }
+  initSession = state => new Session(this, this.getDatabase(), state);
 
   /**
      * Begins a mutable database session.
@@ -189,9 +179,7 @@ export const ORM = class ORM {
      * @param  {Object} state  - the state the database manages
      * @return {Session} a new {@link Session} instance
      */
-  mutableSession (state) {
-    return new Session(this, this.getDatabase(), state, true);
-  }
+  mutableSession = state => new Session(this, this.getDatabase(), state, true);
 };
 
 export default ORM;
