@@ -52,16 +52,14 @@ export const ORM = class ORM {
     this.registry.push(model);
   });
 
-  registerManyToManyModelsFor (model, userProps) {
-    const fields = model.fields;
+  registerManyToManyModelsFor (model, fieldInstance, userProp) {
     const thisModelName = model.modelName;
 
-    forOwn(fields, fieldInstance => {
-      if (fieldInstance instanceof ManyToMany && !fieldInstance.through) {
-        const toModelName = fieldInstance.lazy
-          ? fieldInstance.toModelName(userProps)[0] : fieldInstance.toModelName;
+    if (!fieldInstance.through) {
+      const toModelName = fieldInstance.lazy
+        ? fieldInstance.toModelName(userProp)[0] : fieldInstance.toModelName;
         
-        class ThroughModel extends Model {
+      class ThroughModel extends Model {
           // 如 thisModelName = 'Article', toModelName = 'User', 所以结果为 'Article-User'
           static modelName = m2mName(thisModelName, toModelName);
 
@@ -72,12 +70,11 @@ export const ORM = class ORM {
             // 如 'userId'
             [m2mToFieldName(toModelName)]: new ForeignKey(toModelName)
           }
-        }
-
-        ThroughModel.resetClassCache();
-        this.implicitThroughModels.push(ThroughModel);
       }
-    });
+
+      ThroughModel.resetClassCache();
+      this.implicitThroughModels.push(ThroughModel);
+    }
   }
 
   /**

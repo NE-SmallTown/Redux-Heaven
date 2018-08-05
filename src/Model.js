@@ -17,6 +17,7 @@ import {
   ManyToMany,
   ForeignKey,
   OneToOne,
+  TypeMap,
   attr
 } from './fields';
 import { CREATE, UPDATE, DELETE, FILTER } from './constants';
@@ -53,7 +54,7 @@ const Model = class Model {
   };
   
   static virtualFields = {};
-  
+  static hasRegisterModelsMap = {};
   
   static toString () {
     return `ModelClass: ${this.modelName}`;
@@ -213,12 +214,6 @@ const Model = class Model {
    * @return {Model} a new {@link Model} instance.
    */
   static create (userProps) {
-    if (!this.hasRegisterModels) {
-      this.orm.registerManyToManyModelsFor(this, userProps);
-  
-      this.hasRegisterModels = true;
-    }
-    
     const ret = { ...userProps };
     const m2mRelations = {};
 
@@ -228,6 +223,14 @@ const Model = class Model {
 
     forOwn(this.fields, (fieldInstance, fieldName) => {
       const userPropsHasFieldKey = userProps.hasOwnProperty(fieldName);
+      const userPropsField = userProps[fieldName];
+  
+      if (fieldInstance instanceof ManyToMany && !this.hasRegisterModelsMap[fieldName]) {
+        this.orm.registerManyToManyModelsFor(this, fieldInstance, userPropsField);
+    
+        this.hasRegisterModelsMap[fieldName] = true;
+      }
+  
       // 可以多传在 schema 里没有的 field，但是不能少传
       // TODO 应该是可以少传的，因为 schema 应该只是最大的集合而已
       if (!userPropsHasFieldKey) {
@@ -238,26 +241,30 @@ const Model = class Model {
       }
   
       if (fieldInstance.lazy === undefined) {
-        throw Error(`modelInstance.lazy can't be undefined, please file an issue!`)
+        throw Error(`modelInstance.lazy can't be undefined, please file an issue!`);
       } else if (fieldInstance.lazy) {
-        // 在 field 实例上设置 userProps，以便在 field 内部能够直接获取到 toModelName
+        // 在 field 实例上设置 userPropsField，以便在 field 内部能够直接获取到 toModelName
         // 以便能够通过 fieldInstance.toModelName 获取准确的 toModelName
-        fieldInstance.userProps = userProps;
+        fieldInstance.userProp = userPropsField;
       }
       
       const toModelName = fieldInstance.toModelName;
       const modelClass = this.orm.get(toModelName);
       if (fieldInstance.lazy) {
-        fieldInstance.install(modelClass, fieldName, fieldInstance, this.orm)
+        fieldInstance.install(modelClass, fieldName, fieldInstance, this.orm);
       }
-
-      const userPropsField = userProps[fieldName];
-
+      
       // fieldInstance.install 的时候在 fields.js 里面已经把 model instance 里面的 author 变成了一个 id 数组的 QuerySet
       if (fieldInstance instanceof ManyToMany) {
         m2mRelations[fieldName] = userPropsField;
         ret[fieldName] = this[fieldName].toRefArray();
 
+        return;
+      }
+      
+      if (fieldInstance instanceof TypeMap) {
+        ret[fieldName] = this[fieldName].toRefArray();
+  
         return;
       }
 

@@ -91,11 +91,11 @@ class RelationalField {
   
   get toModelName () {
     if (this.lazy) {
-      if (!this.userProps) {
-        throw Error(`Can't find userProps in field instance when get toModelName, please file an issue!`);
+      if (!this.userProp) {
+        throw Error(`Can't find userProp in field instance when get toModelName, please file an issue!`);
       }
       
-      return this.localToModelName(this.userProps)[0];
+      return this.localToModelName(this.userProp)[0];
     }
     
     return this.localToModelName;
@@ -107,11 +107,11 @@ class RelationalField {
   
   get fieldKeyInToMoel () {
     if (this.lazy) {
-      if (!this.userProps) {
-        throw Error(`Can't find userProps in field instance when get fieldKeyInToMoel, please file an issue!`);
+      if (!this.userProp) {
+        throw Error(`Can't find userProp in field instance when get fieldKeyInToMoel, please file an issue!`);
       }
       
-      return this.localToModelName(this.userProps)[1];
+      return this.localToModelName(this.userProp)[1];
     }
     
     return this.localFieldKeyInToMoel;
@@ -174,6 +174,111 @@ export class ForeignKey extends RelationalField {
 
     const ThisField = this.getClass();
     toModel.virtualFields[nameOfFkModelObjToField] = new ThisField(model.modelName, fieldName);
+  }
+}
+
+export class TypeMap extends RelationalField {
+  install (model, fieldName, fieldInstance, orm) { // fieldName 比如 author，orm 即 orm 实例
+    // // toModelName 比如 author: many('User', 'articles')的话就是 User，注意 toModelName 可能是一个函数
+    // const toModel = orm.get(this.toModelName);
+    // const throughModelName = this.through || m2mName(model.modelName, fieldInstance.toModelName);
+    // const throughModel = orm.get(throughModelName);
+    //
+    // let throughFields;
+    // if (this.throughFields) {
+    //   const [fieldAName, fieldBName] = this.throughFields;
+    //   const fieldA = throughModel.fields[fieldAName];
+    //   if (fieldA.toModelName === toModel.modelName) {
+    //     throughFields = {
+    //       to: fieldAName,
+    //       from: fieldBName
+    //     };
+    //   } else {
+    //     throughFields = {
+    //       to: fieldBName,
+    //       from: fieldAName
+    //     };
+    //   }
+    // } else {
+    //   // 如 fromFieldName = 'articleId'
+    //   const fromFieldName = findKey(
+    //     throughModel.fields,
+    //     field => field instanceof ForeignKey && field.toModelName === model.modelName // model.modelName: 'Article'
+    //   );
+    //   // 如 toFieldName = 'userId'
+    //   const toFieldName = findKey(
+    //     throughModel.fields,
+    //     field => field instanceof ForeignKey && field.toModelName === toModel.modelName // toModel.modelName: 'User'
+    //   );
+    //
+    //   throughFields = {
+    //     from: fromFieldName,
+    //     to: toFieldName
+    //   };
+    // }
+    //
+    // // 定义 forward 字段，重新定义 Article model 上的 author 字段，使其不再是一个对象或者对象数组，而是一个 id 数组
+    // Object.defineProperty(
+    //   model.prototype, // Article.prototype
+    //   fieldName, // author
+    //   manyToManyDescriptor(
+    //     model.modelName, // Article
+    //     toModel.modelName, // User
+    //     throughModelName, // Article-User
+    //     throughFields, // { from: 'articleId', to: 'userId' }
+    //     fieldName, // author
+    //     false
+    //   )
+    // );
+    //
+    // // model.virtualFields['author']
+    // model.virtualFields[fieldName] = new ManyToMany({
+    //   to: toModel.modelName, // 等价于 many('', '') 的第一个参数
+    //   fieldKeyInToMoel: fieldName, // 等价于 many('', '') 的第二个参数
+    //   through: this.through,
+    //   throughFields // 中间表的属性，包含 from 和 to，如 {from: 'articleId', to: 'userId'}
+    // });
+    //
+    // const backwardsFieldName = this.fieldKeyInToMoel; // articles
+    // if (__DEV__) {
+    //   if (Object.getOwnPropertyDescriptor(toModel.prototype, backwardsFieldName)) {
+    //     // Backwards field was already defined on toModel.
+    //     const errorMsg = reverseFieldErrorMessage(
+    //       model.modelName,
+    //       fieldName,
+    //       toModel.modelName,
+    //       backwardsFieldName
+    //     );
+    //
+    //     throw new Error(errorMsg);
+    //   }
+    // }
+    //
+    // // 定义 backward 字段，如在 User Model 上定义 articles 字段
+    // Object.defineProperty(
+    //   toModel.prototype,
+    //   backwardsFieldName,
+    //   manyToManyDescriptor(
+    //     model.modelName, // 这里还是 Artcile 而不是 User，因为下方设置了 true
+    //     toModel.modelName, // User
+    //     throughModelName, // Article-User
+    //     throughFields, // { from: 'articleId', to: 'userId' }
+    //     fieldName, // author
+    //     true // 翻转 fromModel 和 toModel，减少 manyToManyDescriptor 里的重复代码
+    //   )
+    // );
+    //
+    // // toModel.virtualFields['articles']
+    // toModel.virtualFields[backwardsFieldName] = new ManyToMany({
+    //   to: model.modelName, // Article
+    //   fieldKeyInToMoel: fieldName, // author
+    //   through: throughModelName, // Article-User
+    //   throughFields // { from: 'articleId', to: 'userId' }
+    // });
+  }
+  
+  getDefault () {
+    return [];
   }
 }
 
@@ -385,6 +490,10 @@ export const attr = (opts) => new Attribute(opts);
  * @return {ForeignKey}
  */
 export const fk = (...args) => new ForeignKey(...args);
+
+
+
+export const tm = (...args) => new TypeMap(...args);
 
 /**
  * Defines a many-to-many relationship between
