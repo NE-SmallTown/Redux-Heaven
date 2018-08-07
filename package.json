@@ -23,7 +23,7 @@
     "prebuild": "npm run clean",
     "build": "./node_modules/.bin/babel src --out-dir lib --ignore src/examples && webpack && webpack --mode=buil",
     "flow": "flow",
-    "lint": "eslint src tests",
+    "lint": "eslint src/",
     "lint:fix": "npm run lint -- --fix",
     "test": "jest --config=jest.conf.json --coverage",
     "test:dev": "npm run test -- --watch",

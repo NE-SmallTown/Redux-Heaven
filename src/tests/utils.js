@@ -106,6 +106,7 @@ const UsersMock = [
 ];
 
 const getRandomUser = () => UsersMock[Math.floor(Math.random() * UsersMock.length)];
+const getRandomUsers = () => UsersMock.slice(0, Math.floor(Math.random() * UsersMock.length));
 
 // Mock.mock({
 //   'array|10-20': [
@@ -751,8 +752,8 @@ const HomePageMock = {
 //       excerpt: '@cword(20, 30)',
 //       lastUpdatedTime: '@time("T")',
 //       praiseCount: '@integer(0, 1000)',
-//       author: {},
-//       pagination: {}
+//       author: getRandomUser(),
+//       pagination: getRandomPagination()
 //     }]
 // });
 const AnswerMock = [
@@ -765,8 +766,8 @@ const AnswerMock = [
     excerpt: '接拉查清海产自最党平提阶月等型为具义同明',
     lastUpdatedTime: '682867511559',
     praiseCount: 687,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '620000198904185071',
@@ -777,8 +778,8 @@ const AnswerMock = [
     excerpt: '率过计全应率民声始算果众路林矿期率海内元西百育收群',
     lastUpdatedTime: '1125577862228',
     praiseCount: 848,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '340000198806103282',
@@ -789,8 +790,8 @@ const AnswerMock = [
     excerpt: '管才四回在西便求改率从写圆南火走都了别道体政济又写研口主命改',
     lastUpdatedTime: '1215520503964',
     praiseCount: 160,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '46000020040203824X',
@@ -801,8 +802,8 @@ const AnswerMock = [
     excerpt: '单体一格价律强圆以市期须格满其圆外厂色该一公定北',
     lastUpdatedTime: '849854741054',
     praiseCount: 334,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '120000198803229647',
@@ -813,8 +814,8 @@ const AnswerMock = [
     excerpt: '认总近方和重或住场等说月比观北因如般步如派存委火育候中则万',
     lastUpdatedTime: '227293199836',
     praiseCount: 397,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '360000197205028933',
@@ -825,8 +826,8 @@ const AnswerMock = [
     excerpt: '平毛新开种省属决员信线关资在本学区算社层每但派料来化花众周知',
     lastUpdatedTime: '40235738073',
     praiseCount: 200,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '810000200202021123',
@@ -837,8 +838,8 @@ const AnswerMock = [
     excerpt: '方元经整应联般人市加证则及认提需我带着年除干细',
     lastUpdatedTime: '41937526659',
     praiseCount: 853,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '360000197301121660',
@@ -849,8 +850,8 @@ const AnswerMock = [
     excerpt: '约比周代思需几年叫家线极色全运空治同按易派养立么才金酸会',
     lastUpdatedTime: '1037153439153',
     praiseCount: 890,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '310000197005032170',
@@ -861,8 +862,8 @@ const AnswerMock = [
     excerpt: '里种验温消数意会记实采二层精育出林们造不价干斯眼东准到些示打',
     lastUpdatedTime: '572804705254',
     praiseCount: 664,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '430000200701262289',
@@ -873,8 +874,8 @@ const AnswerMock = [
     excerpt: '往济点到界装内她代部线运问收向把斗备合住亲据复结分具',
     lastUpdatedTime: '1241647373428',
     praiseCount: 439,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '210000197801236218',
@@ -885,8 +886,8 @@ const AnswerMock = [
     excerpt: '走才极精类着日听表例马经具类众亲方边道克温受义使则',
     lastUpdatedTime: '267286909728',
     praiseCount: 765,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   },
   {
     id: '500000199508133656',
@@ -897,8 +898,8 @@ const AnswerMock = [
     excerpt: '按型用月节严以第复包织团石和观七叫验养路外压也斯战低两',
     lastUpdatedTime: '1079850564970',
     praiseCount: 277,
-    author: {},
-    pagination: {}
+    author: getRandomUser(),
+    pagination: getRandomPagination()
   }
 ];
 
@@ -910,7 +911,7 @@ const getRandomAnswers = () => AnswerMock.slice(0, Math.floor(Math.random() * An
 //     id: '@id()',
 //     title: '@ctitle()',
 //     description: '@csentence(30, 50)',
-//     author: {},
+//     author: getRandomUser(),
 //     answers: []
 //   }]
 // });
@@ -920,15 +921,15 @@ const QuestionMock = [
     title: '带金克',
     description:
       '然火路现身之家有空往六国后定清家学建决按利联眼明并飞积二己根从根再酸党论件。',
-    author: {},
-    answers: []
+    author: getRandomUser(),
+    answers: getRandomAnswers()
   },
   {
     id: '410000198502167365',
     title: '几力党研员',
     description:
       '常声通决口群信即技支新据采建建位员地般过六分类加快度感一取切路才至格设且。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -936,7 +937,7 @@ const QuestionMock = [
     title: '件特四',
     description:
       '米路在识际各头等边水照的权面队听风得论走步七义能型思较山系技合空照。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -944,7 +945,7 @@ const QuestionMock = [
     title: '动称重',
     description:
       '难书技种之代照难思接查风格引放报质图断置亲状格意先样压上张百便三术处段省术基代。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -952,7 +953,7 @@ const QuestionMock = [
     title: '般家都克说单写',
     description:
       '般参切从难越厂长该边王她千了同近一心精造矿来包物料革据器办好每无法信我并用毛花被。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -960,7 +961,7 @@ const QuestionMock = [
     title: '取将影制发响',
     description:
       '南书育系资他领没转里成条照基市高比工动精知海验革队可集始目片存资段委影属长可越叫前林由质来该场。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -968,7 +969,7 @@ const QuestionMock = [
     title: '能克图动就在位',
     description:
       '美即年劳物如示声许平着真离却儿论接必许决体将毛三调风书记美器克可统从头见至向生质劳利金放山。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -976,7 +977,7 @@ const QuestionMock = [
     title: '众层去共些',
     description:
       '西清发话非克史样问前业史又时复意么龙精由建际权根先社还务区和争查。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -984,7 +985,7 @@ const QuestionMock = [
     title: '无意运难争',
     description:
       '速场是已在以也业会别步生他交实极持安联和就克内南难些天信四位年林山并影下路者正车部她花自有马二离代知。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -992,7 +993,7 @@ const QuestionMock = [
     title: '确因最新',
     description:
       '完花并造现至现记法象公得史史性万出特去无每收以美易机书毛论根地下代向红层之况面。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -1000,7 +1001,7 @@ const QuestionMock = [
     title: '之治意高',
     description:
       '要适本且量条备族说但快时路江年听九称达却车光厂华样市火部备消离力个见强没资。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -1008,7 +1009,7 @@ const QuestionMock = [
     title: '收联里亲',
     description:
       '约说始基比在型教论收级确料里准圆话利离精对阶建白且二可究层事万关。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -1016,7 +1017,7 @@ const QuestionMock = [
     title: '长火马三',
     description:
       '压场代切改流专具响广心应色什示同系类流状九小率新选农报下图它小世记该七日局片业处金许议已公是收已。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   },
   {
@@ -1024,221 +1025,224 @@ const QuestionMock = [
     title: '容为身但',
     description:
       '张来习政温工理系展都门列备世回车置角速矿接备酸用同其产列层往些这展到那度今达设。',
-    author: {},
+    author: getRandomUser(),
     answers: []
   }
 ];
 
+const getRandomQuestion = () => QuestionMock[Math.floor(Math.random() * QuestionMock.length)];
+const getRandomQuestions = () => QuestionMock.slice(0, Math.floor(Math.random() * QuestionMock.length));
+
 // Mock.mock({
 //   'array|10-20': [{
 //     id: '@id()',
-//     answer: {},
-//     author: {},
+//     answer: getRandomAnswer(),
+//     author: getRandomUser(),
 //     content: '@cparagraph(3)',
 //     excerpt: '@csentence(5, 10)',
 //     createdTime: '@time("T")',
 //     isAuthor: '@boolean()',
-//     replyTo: {}
+//     replyTo: getRandomUser()
 //   }]
 // });
 const CommentsMock = [
   {
     id: '630000200906202842',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '同精放里段权年问第设形元务品听制西。习后林由他议许候天者色被称满理。们求支治月则与学情江按能今今。',
     excerpt: '六产真进得义切法据。',
     createdTime: '1367262395344',
     isAuthor: true,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '330000200007208342',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '议之对化国达农面系那节中反京石亲传斗。直比与史点去传音建结响满带往越史。很风合议意象要使按增音教。',
     excerpt: '也期布由数除能京照型。',
     createdTime: '176946436707',
     isAuthor: true,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '12000019870520020X',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '意解应克议你支名己现口来例部。织她众太学张样千道书必美规。志公适本体派严快步导准流受。',
     excerpt: '表龙头数明党队件铁派。',
     createdTime: '1385163736538',
     isAuthor: true,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '320000199310113680',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '加农状引格制速写今示指速导种道党代。正观包造资使力少月通是属王。被际新土争相法活边再或想研史向论被国。',
     excerpt: '结育学还再调着约引。',
     createdTime: '1119919694072',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '51000019821205792X',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '眼给两江间育月老光间质当。子来市然与中反六每要文性处时置合许。影看或至设题小而类体打每打无。',
     excerpt: '素受现着总保。',
     createdTime: '215402300918',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '650000201407157184',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '民治原性强确手门被办米过步局。细因府然过得根话段象明严先方。内两强管格间通思格强实音值从。',
     excerpt: '装响里织意团重听压九。',
     createdTime: '1224554708447',
     isAuthor: true,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '520000201705266523',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '点决工对表基带有反东构便文育使。期个可党管石建上走义号结。全中也而心头速照素交类般情车历两矿。',
     excerpt: '家候历积度近。',
     createdTime: '376732227163',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '71000020041127860X',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '片布管素人没接要常使办种。第则见七去得由近也日地据。清感空传文重酸意者眼真采。',
     excerpt: '厂做率只统斗八长。',
     createdTime: '273346298758',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '330000198805242449',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '来又们族报查少断条北强据象却律车。六因命战效近历人可龙才为张书克华即。验清象流些象开场电们各按放日。',
     excerpt: '发管形至转华。',
     createdTime: '6165319577',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '54000020021028135X',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '务影总化命需样年增展不细花成入情明。中只候务布北它政统养约思委府满。日间起许形儿音会完达叫如么变。',
     excerpt: '照提先消需定县查据王。',
     createdTime: '1435862195955',
     isAuthor: true,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '990000200608296248',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '单平存后该物我并到位用口线易。华把较除清头知地矿量断温委法产带。所先名风南性位有光再斗活清如。',
     excerpt: '备系定格称。',
     createdTime: '564732635829',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '420000198710048231',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '整水信广了六求离能农直认空广正。青点关制今实两明类角基真的指压是才。共给低段技表油经酸统流每千无算国。',
     excerpt: '入听往进月界问月。',
     createdTime: '635214542643',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '710000200110144894',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '时起等发军号金气亲难高广社速采新。看传年所法之满受半选色流成布多又验。影标进共本千机斗节据及子。',
     excerpt: '明至院非们备照。',
     createdTime: '306283771809',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '220000200305281550',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '千育观并使王思为易条龙常调量气了般王。最领没候管参转界该层老速完件名以重。两半及时至料很期条物听术单划布文程向。',
     excerpt: '物京规强总则。',
     createdTime: '1496516610589',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '14000019920328857X',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '象人地带特达非象除步农型他。者应还史议清近火级区切活解县状。候现用位由子示队条反会身酸置受革由。',
     excerpt: '发路其发代部值儿且。',
     createdTime: '608025956954',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '310000201101037544',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '资利压民关完因思高养快派识花响律住。和即你团而解活这规江音素空更思花。这色列很备八劳义不产由片共历。',
     excerpt: '接支把题证干红方。',
     createdTime: '368011892796',
     isAuthor: true,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '15000019981005913X',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '但么把很天感件要步放毛样图文动斗性单。有应克去亲据据转号决选声用。内美革件今片广己省圆因情条头石声。',
     excerpt: '重党离向特。',
     createdTime: '236813116309',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   },
   {
     id: '36000019860428666X',
-    answer: {},
-    author: {},
+    answer: getRandomAnswer(),
+    author: getRandomUser(),
     content:
       '前合新使决布装新深即万平形北。受十这从民新周委广当称见声人道。几只素等重老金什音好层争清集具现书。',
     excerpt: '省阶下光全月。',
     createdTime: '619406176544',
     isAuthor: false,
-    replyTo: {}
+    replyTo: getRandomUser()
   }
 ];
 
@@ -1314,91 +1318,91 @@ const AdMock = [
 //     {
 //       id: '@id()',
 //       title: '@ctitle(4, 6)',
-//       followers: [],
-//       questions: []
+//       followers: getRandomUsers(),
+//       questions: getRandomQuestions()
 //     }]
 // });
 const TopicMock = [
-  { id: '370000197806103478', title: '速规场引', followers: [], questions: [] },
+  { id: '370000197806103478', title: '速规场引', followers: getRandomUsers(), questions: getRandomQuestions() },
   {
     id: '410000201507275044',
     title: '常片机形计',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
-  { id: '36000019950624476X', title: '我们给候', followers: [], questions: [] },
+  { id: '36000019950624476X', title: '我们给候', followers: getRandomUsers(), questions: getRandomQuestions() },
   {
     id: '440000200812047030',
     title: '划管今即织带',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '450000200604223222',
     title: '结等地定他',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '820000200307278576',
     title: '具证么条是',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '630000198909181274',
     title: '候联习约广量',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '120000198812082958',
     title: '红山单任得',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '41000020180507411X',
     title: '结原参感单',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '230000199005227823',
     title: '流出计己理图',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '71000020011001247X',
     title: '根织定安体',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '14000019841123263X',
     title: '列时比小组',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
-  { id: '110000197811097844', title: '记明又很', followers: [], questions: [] },
+  { id: '110000197811097844', title: '记明又很', followers: getRandomUsers(), questions: getRandomQuestions() },
   {
     id: '650000197001288177',
     title: '斗将果克正',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '820000197208129730',
     title: '一儿知数强',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   },
   {
     id: '540000197501042143',
     title: '些事据如变低',
-    followers: [],
-    questions: []
+    followers: getRandomUsers(),
+    questions: getRandomQuestions()
   }
 ];
 
@@ -1406,28 +1410,28 @@ const TopicMock = [
 //   'array|10-20': [
 //     {
 //       id: '@id()',
-//       question: {},
-//       answer: {}
+//       question: getRandomQuestion(),
+//       answer: getRandomAnswer()
 //     }]
 // });
 const QAnswerMock = [
-  { id: '640000198907045342', question: {}, answer: {} },
-  { id: '360000197512114583', question: {}, answer: {} },
-  { id: '350000198011292632', question: {}, answer: {} },
-  { id: '350000199905070160', question: {}, answer: {} },
-  { id: '230000199211062652', question: {}, answer: {} },
-  { id: '62000019790127658X', question: {}, answer: {} },
-  { id: '630000200405197889', question: {}, answer: {} },
-  { id: '710000201605231484', question: {}, answer: {} },
-  { id: '510000201609181210', question: {}, answer: {} },
-  { id: '440000200106305151', question: {}, answer: {} },
-  { id: '230000197302272269', question: {}, answer: {} },
-  { id: '21000020060422217X', question: {}, answer: {} },
-  { id: '990000197705065543', question: {}, answer: {} },
-  { id: '710000201304086914', question: {}, answer: {} },
-  { id: '360000201605105327', question: {}, answer: {} },
-  { id: '820000201210202561', question: {}, answer: {} },
-  { id: '220000198008111643', question: {}, answer: {} }
+  { id: '640000198907045342', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '360000197512114583', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '350000198011292632', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '350000199905070160', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '230000199211062652', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '62000019790127658X', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '630000200405197889', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '710000201605231484', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '510000201609181210', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '440000200106305151', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '230000197302272269', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '21000020060422217X', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '990000197705065543', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '710000201304086914', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '360000201605105327', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '820000201210202561', question: getRandomQuestion(), answer: getRandomAnswer() },
+  { id: '220000198008111643', question: getRandomQuestion(), answer: getRandomAnswer() }
 ];
 
 export function createTestModels () {
@@ -1594,8 +1598,11 @@ export function createTestSessionWithData (orm = createTestORM()) {
     mockDataArr.forEach(mockData => mockModel.create(mockData))
   );
 
-  const normalSession = orm.initSession(state);
-  return { session: normalSession, orm, state };
+  return {
+    session: orm.initSession(state),
+    orm,
+    state
+  };
 }
 
 export const isSubclass = (a, b) => a.prototype instanceof b;

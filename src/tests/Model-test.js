@@ -1,5 +1,5 @@
 import deepFreeze from 'deep-freeze';
-import { Model, ORM, attr, many } from '../index';
+import { Model, ORM, attr, many, tm } from '../index';
 import { createTestSessionWithData } from './utils';
 
 describe('Model', () => {
