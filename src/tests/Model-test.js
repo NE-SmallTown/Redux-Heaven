@@ -1,6 +1,7 @@
 import deepFreeze from 'deep-freeze';
 import { Model, ORM, attr, many, tm } from '../index';
 import { createTestSessionWithData } from './utils';
+import { oneToOne } from "../fields";
 
 describe('Model', () => {
   let session;
@@ -20,54 +21,68 @@ describe('Model', () => {
     });
 
     it('Models correctly create new instances', () => {
-      const { Reply } = session;
-      const reply = Reply.create({
+      const { Answer } = session;
+      const answerCount = session.Answer.count();
+      const answerData = {
         id: '123',
-        host: '1',
-        author: '5400001',
-        createdTime: '1998-09-30 16:12:59'
-      });
-
-      expect(session.Reply.count()).toBe(4); // initial we aleady have 3 replies
-      expect(session.Reply.last().ref).toBe(reply.ref);
-    });
-
-    it('Model.create throws if passing duplicate ids to many-to-many field', () => {
-      const { Reply } = session;
-
-      const newProps = {
-        id: '123',
-        author: 2,
-        hobbies: [0, 0]
+        question: {
+    
+        },
+        author: {
+    
+        },
+        commentCount: ,
+        content: attr(),
+        createdTime: attr(),
+        excerpt: attr(),
+        lastUpdatedTime: attr(),
+        praiseCount: attr(),
+        pagination: oneToOne('Pagination', 'answers')
       };
+      const answer = Answer.create(answerData);
+      const answerInstanceInSession = session.Answer.last();
 
-      expect(() => Reply.create(newProps)).toThrowError('Reply.hobbies');
+      expect(session.Answer.count()).toBe(answerCount + 1);
+      expect(answerInstanceInSession.ref).toBe(answer.ref);
+      expect(JSON.stringify(answerInstanceInSession.ref)).toBe(JSON.stringify(answerData));
     });
 
-    it('Model works with default value', () => {
-      let defaultId = 1;
-
-      class DefaultFieldModel extends Model {
-        static modelName = 'DefaultFieldModel'
-
-        static fields = {
-          id: attr({ getDefault: () => defaultId })
-        }
-      }
-
-      const _orm = new ORM();
-      _orm.register(DefaultFieldModel);
-
-      const _session = _orm.initSession(_orm.getEmptyState());
-      _session.DefaultFieldModel.create({});
-
-      expect(_session.DefaultFieldModel.hasId(1)).toBe(true);
-
-      defaultId = 999;
-      _session.DefaultFieldModel.create({});
-      expect(_session.DefaultFieldModel.hasId(999)).toBe(true);
-    });
-  });
+  //   it('Model.create throws if passing duplicate ids to many-to-many field', () => {
+  //     const { Reply } = session;
+  //
+  //     const newProps = {
+  //       id: '123',
+  //       author: 2,
+  //       hobbies: [0, 0]
+  //     };
+  //
+  //     expect(() => Reply.create(newProps)).toThrowError('Reply.hobbies');
+  //   });
+  //
+  //   it('Model works with default value', () => {
+  //     let defaultId = 1;
+  //
+  //     class DefaultFieldModel extends Model {
+  //       static modelName = 'DefaultFieldModel'
+  //
+  //       static fields = {
+  //         id: attr({ getDefault: () => defaultId })
+  //       }
+  //     }
+  //
+  //     const _orm = new ORM();
+  //     _orm.register(DefaultFieldModel);
+  //
+  //     const _session = _orm.initSession(_orm.getEmptyState());
+  //     _session.DefaultFieldModel.create({});
+  //
+  //     expect(_session.DefaultFieldModel.hasId(1)).toBe(true);
+  //
+  //     defaultId = 999;
+  //     _session.DefaultFieldModel.create({});
+  //     expect(_session.DefaultFieldModel.hasId(999)).toBe(true);
+  //   });
+  // });
 
 /*  describe('many-many forward/backward updates', () => {
     let Team;
