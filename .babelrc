@@ -1,6 +1,7 @@
 {
   "plugins": [
-    "transform-class-properties syntax-class-properties",
+    "transform-class-properties",
+    "syntax-class-properties",
     "transform-decorators-legacy",
     "transform-object-rest-spread",
     "transform-export-extensions"

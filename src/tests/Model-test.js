@@ -1,12 +1,15 @@
 import deepFreeze from 'deep-freeze';
+import Mock from 'mockjs';
 import { Model, ORM, attr, many, tm } from '../index';
 import { createTestSessionWithData } from './utils';
+import * as mockUtils from './mockUtils'
 import { oneToOne } from "../fields";
 
 describe('Model', () => {
   let session;
   let orm;
   let state;
+  const Random = Mock.Random;
 
   describe('Normal create', () => {
     beforeEach(() => {
@@ -25,13 +28,9 @@ describe('Model', () => {
       const answerCount = session.Answer.count();
       const answerData = {
         id: '123',
-        question: {
-    
-        },
-        author: {
-    
-        },
-        commentCount: ,
+        question: mockUtils.mockOneQuestion(),
+        author: mockUtils.mockOneUser(),
+        commentCount: Random.integer(0, 99999),
         content: attr(),
         createdTime: attr(),
         excerpt: attr(),
