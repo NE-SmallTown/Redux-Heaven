@@ -6,7 +6,7 @@
 
 import invariant from 'invariant';
 import mapValues from 'lodash/mapValues';
-import ops from 'immutable-ops';
+import ops from './immutable-ops';
 
 import Table from './Table';
 import { QUERY, CREATE, UPDATE, DELETE, SUCCESS } from './constants';

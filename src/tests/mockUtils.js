@@ -4,7 +4,7 @@ import curry from 'lodash/curry';
 
 export const mockArrayData = (mockOneDataFunc, start, end) => [...Array(start + random(end - start))].map(mockOneDataFunc);
 
-export const mockOneUser = Mock.mock({
+export const mockOneUser = () => Mock.mock({
   userId: '@id()',
   userName: '@cname()',
   loginName: '@name()',
@@ -14,14 +14,14 @@ export const mockOneUser = Mock.mock({
 export const mockManyUsers = curry(mockArrayData)(mockOneUser);
 export const UsersMock = mockManyUsers(10, 20);
 
-export const mockOnePagination = Mock.mock({
+export const mockOnePagination = () => Mock.mock({
   id: '@id()',
   currentPage: '@integer(20)',
   pageSize: '@integer(15)',
   totalCount: '@integer(100)@'
 });
 export const mockManyPaginations = curry(mockArrayData)(mockOnePagination);
-export const PaginationsMock = mockManyPaginations(10, 20);
+export const PaginationMock = mockManyPaginations(10, 20);
 
 // https://www.zhihu.com/api/v3/feed/topstory
 export const HomePageMock = {
@@ -529,7 +529,7 @@ export const HomePageMock = {
   ]
 };
 
-export const mockOneAnswer = Mock.mock({
+export const mockOneAnswer = () => Mock.mock({
   id: '@id()',
   commentCount: '@integer(0, 1000)',
   content: '@cparagraph(5, 10)',
@@ -543,7 +543,7 @@ export const mockOneAnswer = Mock.mock({
 export const mockManyAnswers = curry(mockArrayData)(mockOneAnswer);
 export const AnswerMock = mockManyAnswers(10, 20);
 
-export const mockOneQuestion = Mock.mock({
+export const mockOneQuestion = () => Mock.mock({
   id: '@id()',
   title: '@ctitle()',
   description: '@csentence(30, 50)',
@@ -553,7 +553,7 @@ export const mockOneQuestion = Mock.mock({
 export const mockManyQuestions = curry(mockArrayData)(mockOneQuestion);
 export const QuestionMock = mockManyQuestions(10, 20);
 
-export const mockOneComment = Mock.mock({
+export const mockOneComment = () => Mock.mock({
   id: '@id()',
   answer: mockOneAnswer(),
   author: mockOneUser(),
@@ -566,7 +566,7 @@ export const mockOneComment = Mock.mock({
 export const mockManyComments = curry(mockArrayData)(mockOneComment);
 export const CommentsMock = mockManyComments(10, 20);
 
-export const mockOneAd = Mock.mock({
+export const mockOneAd = () => Mock.mock({
   id: '@id()',
   title: '@title()',
   coverUrl: '@image()',
@@ -575,7 +575,7 @@ export const mockOneAd = Mock.mock({
 export const mockManyAds = curry(mockArrayData)(mockOneAd);
 export const AdMock = mockManyAds(10, 20);
 
-export const mockOneTopic = Mock.mock({
+export const mockOneTopic = () => Mock.mock({
   id: '@id()',
   title: '@ctitle(4, 6)',
   followers: mockManyUsers(),
@@ -584,7 +584,7 @@ export const mockOneTopic = Mock.mock({
 export const mockManyTopics = curry(mockArrayData)(mockOneTopic);
 export const TopicMock = mockManyTopics(10, 20);
 
-export const mockOneQAnswer = Mock.mock({
+export const mockOneQAnswer = () => Mock.mock({
   id: '@id()',
   question: mockOneQuestion(),
   answer: mockOneAnswer()

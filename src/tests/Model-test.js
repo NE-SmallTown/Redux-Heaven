@@ -2,8 +2,8 @@ import deepFreeze from 'deep-freeze';
 import Mock from 'mockjs';
 import { Model, ORM, attr, many, tm } from '../index';
 import { createTestSessionWithData } from './utils';
-import * as mockUtils from './mockUtils'
-import { oneToOne } from "../fields";
+import * as mockUtils from './mockUtils';
+import { oneToOne } from '../fields';
 
 describe('Model', () => {
   let session;
@@ -19,10 +19,10 @@ describe('Model', () => {
         orm,
         state
       } = createTestSessionWithData());
-
+    
       deepFreeze(state);
     });
-
+  
     it('Models correctly create new instances', () => {
       const { Answer } = session;
       const answerCount = session.Answer.count();
@@ -40,11 +40,12 @@ describe('Model', () => {
       };
       const answer = Answer.create(answerData);
       const answerInstanceInSession = session.Answer.last();
-
+    
       expect(session.Answer.count()).toBe(answerCount + 1);
       expect(answerInstanceInSession.ref).toBe(answer.ref);
       expect(JSON.stringify(answerInstanceInSession.ref)).toBe(JSON.stringify(answerData));
     });
+  });
 
   //   it('Model.create throws if passing duplicate ids to many-to-many field', () => {
   //     const { Reply } = session;

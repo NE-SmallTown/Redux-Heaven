@@ -25,7 +25,7 @@
     "flow": "flow",
     "lint": "eslint src/",
     "lint:fix": "npm run lint -- --fix",
-    "test": "jest --config=jest.conf.json --coverage",
+    "test": "jest --config=jest.conf.json --coverage --no-cache",
     "test:dev": "npm run test -- --watch",
     "codecov": "cat coverage/*/lcov.info | codecov"
   },
@@ -38,7 +38,7 @@
     "url": "https://github.com/NE-SmallTown/redux-Heaven/issues"
   },
   "homepage": "https://github.com/NE-SmallTown/redux-Heaven",
-  "license": "MIT License",
+  "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.4",
     "redux": "^3.6.0",
@@ -77,6 +77,7 @@
     "css-loader": "^0.26.1",
     "cssnano": "^3.7.4",
     "debug": "^2.2.0",
+    "deep-freeze": "0.0.1",
     "enzyme": "^2.0.0",
     "eslint": "^5.2.0",
     "eslint-config-standard": "^6.0.0",

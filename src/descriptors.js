@@ -8,7 +8,7 @@ import {
   includes
 } from './utils';
 
-const attrDescriptor = (fieldName) => ({
+export const attrDescriptor = (fieldName) => ({
   get () {
     return this.finalUserProps[fieldName];
   },
@@ -21,7 +21,7 @@ const attrDescriptor = (fieldName) => ({
   configurable: true
 });
 
-const fieldToFkModelObjDescriptor = (fieldName, toModelName) => ({
+export const fieldToFkModelObjDescriptor = (fieldName, toModelName) => ({
   get () {
     const session = this.getClass().session;
     const toModel = session[toModelName];
@@ -47,7 +47,7 @@ const fieldToFkModelObjDescriptor = (fieldName, toModelName) => ({
 });
 
 // Reverse side of a Foreign Key: returns many objects.
-const fkModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
+export const fkModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
   get () {
     const session = this.getClass().session;
     const fromModel = session[fromModelName];
@@ -65,25 +65,7 @@ const fkModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
   }
 });
 
-const TypeMapDescriptor = (declaredFieldName, fromModelName) => ({
-  get () {
-    // const session = this.getClass().session;
-    // const fromModel = session[fromModelName];
-    // const thisId = this.getId();
-    // // 原本 session.Host.withId(hostId).replies 会执行到上面的这个 get 函数，然后 return 的时候执行 .filter，.filter 会返回一个 QuerySet，
-    // // 所以才能够继续执行 .replies.toRefArray()，但是大多数情况下我们并不需要执行 .toRefArray()，因为大多数情况
-    // // 本身就希望得到的是 refArray，而不是 QuerySet，所以这里改成默认返回 refArray，如果需要返回 QuerySet，
-    // // 则需要用显式的方式，即 model.getQuerySet()
-    // // 原本代码为:  return fromModel.filter({ [declaredFieldName]: thisId });
-    // // 修改后代码为: return fromModel.filter({ [declaredFieldName]: thisId }).toRefArray()
-    // return fromModel.filter({ [declaredFieldName]: thisId }).toRefArray();
-  },
-  set () {
-    throw new Error('Can\'t mutate a reverse many-to-one relation.');
-  }
-});
-
-const oneModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
+export const oneModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
   get () {
     const session = this.getClass().session;
     const fromModel = session[fromModelName];
@@ -97,10 +79,10 @@ const oneModelObjToFieldDescriptor = (declaredFieldName, fromModelName) => ({
   }
 });
 
-const definedManyToManyDescriptorMap = {};
+export const definedManyToManyDescriptorMap = {};
 
 // reverse 为 false 的时候代表 forward，为 true 的时候代表 backward
-const manyToManyDescriptor = memoize((
+export const manyToManyDescriptor = memoize((
   fromModelName, // Article
   toModelName, // User
   throughModelName, // Article-User
@@ -210,15 +192,6 @@ const manyToManyDescriptor = memoize((
 (fromModelName, toModelName, throughModelName, throughFields, fieldName, reverse) =>
   throughModelName + '--' + fieldName + '--' + reverse);
 
-const fieldToOneModelObjDescriptor = fieldToFkModelObjDescriptor;
+export const fieldToOneModelObjDescriptor = fieldToFkModelObjDescriptor;
 
 // TODO 调整命名
-export {
-  attrDescriptor,
-  fieldToFkModelObjDescriptor,
-  fieldToOneModelObjDescriptor,
-  fkModelObjToFieldDescriptor,
-  oneModelObjToFieldDescriptor,
-  manyToManyDescriptor,
-  TypeMapDescriptor
-};

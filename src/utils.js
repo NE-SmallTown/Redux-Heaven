@@ -53,8 +53,8 @@ const m2mFromFieldName = declarationModelName => declarationModelName + 'Id';
  */
 const m2mToFieldName = m2mFromFieldName;
 
-const querySetDelegatorFactory = methodName => function(...args) {
-  return this.getQuerySet()[methodName](...args)
+const querySetDelegatorFactory = methodName => function (...args) {
+  return this.getQuerySet()[methodName](...args);
 };
 
 const querySetGetterDelegatorFactory = getterName => function () {
@@ -62,7 +62,6 @@ const querySetGetterDelegatorFactory = getterName => function () {
   
   return qs[getterName];
 };
-
 
 const forEachSuperClass = (subClass, func) => {
   let currClass = subClass;
@@ -111,7 +110,7 @@ const attachQuerySetMethods = (modelClass, querySetClass) => {
  */
 const normalizeEntity = entity => {
   if (!entity) {
-    throw Error(`You must pass entity but got ${entity}`)
+    throw Error(`You must pass entity but got ${entity}`);
   }
 
   return entity.getId ? entity.getId() : entity;
@@ -154,8 +153,8 @@ function putCandidateIdKeyIntoObject (obj, idAttribute, candidateIdKes) {
   if (!obj[idAttribute]) {
     for (const key of candidateIdKes) {
       if (obj[key]) {
-          obj[idAttribute] = obj[key];
-          break;
+        obj[idAttribute] = obj[key];
+        break;
       }
     }
   }
@@ -171,5 +170,5 @@ export {
   objectShallowEquals,
   includes,
   arrayDiffActions,
-  putCandidateIdKeyIntoObject,
+  putCandidateIdKeyIntoObject
 };

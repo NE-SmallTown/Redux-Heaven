@@ -243,7 +243,7 @@ const Model = class Model {
       if (fieldInstance.lazy === undefined) {
         throw Error(`modelInstance.lazy can't be undefined, please file an issue!`);
       } else if (fieldInstance.lazy) {
-        // 在 field 实例上设置 userPropsField，以便在 field 内部能够直接获取到 toModelName
+        // 在 field 实例上设置 userProp，以便在 field 内部能够直接获取到 toModelName
         // 以便能够通过 fieldInstance.toModelName 获取准确的 toModelName
         fieldInstance.userProp = userPropsField;
       }

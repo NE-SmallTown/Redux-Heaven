@@ -5,7 +5,7 @@
  */
 
 import invariant from 'invariant';
-import { getBatchToken } from 'immutable-ops';
+import { getBatchToken } from './immutable-ops';
 
 import { QUERY, SUCCESS } from './constants';
 

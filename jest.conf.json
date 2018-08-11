@@ -20,8 +20,5 @@
   "modulePathIgnorePatterns": [
     "src/examples/"
   ],
-  "testRegex": "src/tests/.*js",
-  "transform": {
-    ".*.js": "./node_modules/babel-jest"
-  }
+  "testRegex": "src/tests/.*-test.js"
 }

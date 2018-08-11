@@ -87,7 +87,7 @@ export default class Table {
 
       this.makeStateShallowMergeItSelf();
     } else {
-      new Error(`Insert error: the item of ${this.idAttribute}(${itemId}) has existed in the ${this.constructor.name} Table`);
+      throw Error(`Insert error: the item of ${this.idAttribute}(${itemId}) has existed in the ${this.constructor.name} Table`);
     }
   }
 

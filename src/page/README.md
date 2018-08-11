@@ -26,7 +26,7 @@ class WebSite/HomePage extends Model {
 ```
 
 One WebSite/HomePage has **many** feeds to one user. But we can't use `fk` or `many` relation to the `feeds` field,
-because `fk` needs the data must be an object(here feeds must be an array), and although `many` allow `feeds` is an array,
+because `fk` needs the data must be an object(but here feeds is an array), and although `many` allow `feeds` is an array,
 but the toModel doesn't have 0, 1 or many webSite/homePage.
 
 So, we introduce one new relationship, tm(type map).
@@ -39,7 +39,7 @@ const typeMap = {
     type3: 'Model3
 }
 
-// note: you need define Model1, Model2, Model1 before
+// note: you need register Model1, Model2, Model1 before
 feeds: tm(type => typeMap[type])
 ```
 
