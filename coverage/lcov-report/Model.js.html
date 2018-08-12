@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0.52% </span>
+        <span class="strong">2.07% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>1/193</span>
+        <span class='fraction'>4/193</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
@@ -30,14 +30,14 @@
         <span class='fraction'>0/85</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">4.88% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/41</span>
+        <span class='fraction'>2/41</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0.52% </span>
+        <span class="strong">2.08% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/192</span>
+        <span class='fraction'>4/192</span>
       </div>
     </div>
     <p class="quiet">
@@ -685,7 +685,8 @@
 <a name='L637'></a><a href='#L637'>637</a>
 <a name='L638'></a><a href='#L638'>638</a>
 <a name='L639'></a><a href='#L639'>639</a>
-<a name='L640'></a><a href='#L640'>640</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L640'></a><a href='#L640'>640</a>
+<a name='L641'></a><a href='#L641'>641</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -744,6 +745,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -798,8 +800,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1097,7 +1099,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1381,6 +1383,7 @@ const Model = class Model {
   
   static virtualFields = {};
   static hasRegisterModelsMap = {};
+  static querySetClass = QuerySet;
   
 <span class="fstat-no" title="function not covered" >  st</span>atic toString () {
 <span class="cstat-no" title="statement not covered" >    return `ModelClass: ${this.modelName}`;</span>
@@ -1436,9 +1439,9 @@ const Model = class Model {
 <span class="cstat-no" title="statement not covered" >    return new QuerySet(this);</span>
   }
   
-<span class="fstat-no" title="function not covered" >  st</span>atic resetClassCache () {
-<span class="cstat-no" title="statement not covered" >    this.isSetUp = undefined;</span>
-<span class="cstat-no" title="statement not covered" >    this.virtualFields = {};</span>
+  static resetClassCache () {
+    this.isSetUp = undefined;
+    this.virtualFields = {};
   }
   
 <span class="fstat-no" title="function not covered" >  st</span>atic get query () {
@@ -1460,7 +1463,7 @@ const Model = class Model {
 <span class="fstat-no" title="function not covered" >  in</span>itFields (fields) {
 <span class="cstat-no" title="statement not covered" >    this.finalUserProps = { ...fields };</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    forOwn(fields, <span class="fstat-no" title="function not covered" >(f</span>ieldValue, fieldName) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    forOwn(fields, <span class="fstat-no" title="function not covered" >(_</span>, fieldName) =&gt; {</span>
       // In this case, we got a prop that wasn't defined as a field.
       // Assuming it's an arbitrary data field, making an instance-specific
       // descriptor for it.
@@ -1569,7 +1572,7 @@ const Model = class Model {
 <span class="cstat-no" title="statement not covered" >      if (fieldInstance.lazy === undefined) {</span>
 <span class="cstat-no" title="statement not covered" >        throw Error(`modelInstance.lazy can't be undefined, please file an issue!`);</span>
       } else <span class="cstat-no" title="statement not covered" >if (fieldInstance.lazy) {</span>
-        // 在 field 实例上设置 userPropsField，以便在 field 内部能够直接获取到 toModelName
+        // 在 field 实例上设置 userProp，以便在 field 内部能够直接获取到 toModelName
         // 以便能够通过 fieldInstance.toModelName 获取准确的 toModelName
 <span class="cstat-no" title="statement not covered" >        fieldInstance.userProp = userPropsField;</span>
       }
@@ -1583,13 +1586,13 @@ const Model = class Model {
       // fieldInstance.install 的时候在 fields.js 里面已经把 model instance 里面的 author 变成了一个 id 数组的 QuerySet
 <span class="cstat-no" title="statement not covered" >      if (fieldInstance instanceof ManyToMany) {</span>
 <span class="cstat-no" title="statement not covered" >        m2mRelations[fieldName] = userPropsField;</span>
-<span class="cstat-no" title="statement not covered" >        ret[fieldName] = this[fieldName].toRefArray();</span>
+<span class="cstat-no" title="statement not covered" >        ret[fieldName] = this[fieldName]; </span>// 直接访问返回的就是 ids 了，不用 toRefArray()，因为返回的不是 QuerySet
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        return;</span>
       }
       
 <span class="cstat-no" title="statement not covered" >      if (fieldInstance instanceof TypeMap) {</span>
-<span class="cstat-no" title="statement not covered" >        ret[fieldName] = this[fieldName].toRefArray();</span>
+<span class="cstat-no" title="statement not covered" >        ret[fieldName] = this[fieldName]; </span>// 直接访问返回的就是 ids 了，不用 toRefArray()，因为返回的不是 QuerySet
   
 <span class="cstat-no" title="statement not covered" >        return;</span>
       }
@@ -1735,8 +1738,8 @@ const Model = class Model {
 <span class="cstat-no" title="statement not covered" >    return this.constructor;</span>
   }
   
-<span class="fstat-no" title="function not covered" >  se</span>tOrm (orm) {
-<span class="cstat-no" title="statement not covered" >    this.orm = orm;</span>
+  static setOrm (orm) {
+    this.orm = orm;
   }
 &nbsp;
   /**
@@ -1969,7 +1972,7 @@ export default Model;
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sat Aug 11 2018 16:41:10 GMT+0800 (CST)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sun Aug 12 2018 21:45:11 GMT+0800 (CST)
 </div>
 </div>
 <script src="prettify.js"></script>

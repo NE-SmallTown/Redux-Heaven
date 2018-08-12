@@ -5,6 +5,10 @@ so of course redux-heaven offer you 2 choices.
 
 ## Page (This README)
 
+### fk
+`fk` should not be defined in both models, it just can be defined the one model. 
+
+### tm
 `fk` represent the toModel has 0, 1 or many items of this model.
 E.g. `class Book extends Model { publisher: fk('Publisher', 'books') }` represent one publisher
 could have 0, 1 or many books. But one book **just have one publisher**. The `publisher` field in a book data **must** be an object, can't be an array, string, or anything else.

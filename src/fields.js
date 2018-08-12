@@ -34,7 +34,7 @@ export class Attribute {
     }
   }
 
-  install (model, fieldName, fieldInstance, orm) {
+  install (model, fieldName) {
     Object.defineProperty(
       model.prototype,
       fieldName,
@@ -82,7 +82,7 @@ class RelationalField {
       this.fieldKeyInToMoel = args[1];
     }
 
-    if (toModelName === undefined || this.fieldKeyInToMoel === undefined) {
+    if (toModelName === undefined || (!(args.length === 1 && isFunction(args[0])) && this.fieldKeyInToMoel === undefined)) {
       this.clearFields();
 
       throw new Error(`When you use fk or many, you must provide 'to' and 'fieldKeyInToMoel'(when you pass an object
@@ -148,6 +148,13 @@ export class ForeignKey extends RelationalField {
     // TODO 对于 fk 和 many，需要在 fk 和 many 对应的 Model 里面添加一个以 ids 结尾的 field
     // 比如 Book 的 author 是 fk('User', 'books')，那么需要在 User 里面加上一个 booksIds 用来代表 books 的 id 列表
     // 从而避免使用的时候有大量的 user.books.toRefArray().map(({id}) => id) 这种
+    if (Object.getOwnPropertyDescriptor(model.prototype, nameOfFieldToFkModelObj)) {
+      throw Error(`
+        The property ${nameOfFieldToFkModelObj} has been defined in the Model(${model.modelName}),
+        you probably defined the field in both models, please remove it either.
+      `);
+    }
+    
     Object.defineProperty(
       model.prototype,
       nameOfFieldToFkModelObj,
@@ -181,6 +188,7 @@ export class ForeignKey extends RelationalField {
 }
 
 export class TypeMap extends RelationalField {
+  // 比如 Model fields 里面有：{ feeds: fk(({ type }) => ({ 'question': 'Question', 'question-answer': 'QAnswer' })[type]) }
   install (model, fieldName, fieldInstance, orm) { // fieldName 比如 feeds，orm 即 orm 实例
     // toModelName 比如 author: many('User', 'articles')的话就是 User，注意 toModelName 可能是一个函数
     const typeMapFunction = this.toModelName;
@@ -204,7 +212,7 @@ export class TypeMap extends RelationalField {
     });
     fieldInstance.idRelations = dataArray;
     
-    // 比如 Model fields 里面有：{ feeds: fk(({ type }) => ({ 'question': 'Question', 'question-answer': 'QAnswer' })[type]) }
+    // TODO 想想更新后怎么更新 dataArray
     Object.defineProperty(
       model.prototype,
       fieldName,
@@ -218,8 +226,9 @@ export class TypeMap extends RelationalField {
       }
     );
   
-    const ThisField = this.getClass();
-    toModel.virtualFields[fieldName] = new ThisField(model.modelName, fieldName);
+    // 由于并没有在 toModel 里面设置 backward field，所以这里也不需要设置 virtualFields
+    // const ThisField = this.getClass();
+    // toModel.virtualFields[nameOfFkModelObjToField] = new ThisField(model.modelName, fieldName);
   }
   
   getDefault () {

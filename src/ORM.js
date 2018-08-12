@@ -73,6 +73,7 @@ export const ORM = class ORM {
       }
 
       ThroughModel.resetClassCache();
+      需要往registry里面 push?
       this.implicitThroughModels.push(ThroughModel);
     }
   }

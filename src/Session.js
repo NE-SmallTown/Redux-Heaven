@@ -29,6 +29,12 @@ const Session = class Session {
     this.withMutations = withMutations;
     this.batchToken = batchToken;
     this.modelData = {};
+  
+    orm.getModelClasses().forEach(model => {
+      Object.defineProperty(this, model.modelName, {
+        get: () => model
+      });
+    });
   }
 
   markAccessed (modelName) {

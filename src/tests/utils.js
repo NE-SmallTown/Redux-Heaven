@@ -10,7 +10,7 @@ import { fk, many, oneToOne, attr, tm } from '../fields';
  */
 
 export function createTestModels () {
-  const HomePage = class HomePageModel extends Model {
+  const UserHomePage = class HomePageModel extends Model {
     static modelName = 'UserHomePage';
     static typeMap = {
       'question': 'Question',
@@ -22,7 +22,7 @@ export function createTestModels () {
     static fields = {
       id : attr(),
       navbars: attr(),
-      feeds: tm(({ type }) => HomePage.typeMap[type])
+      feeds: tm(({ type }) => UserHomePage.typeMap[type])
     };
   };
   
@@ -43,7 +43,6 @@ export function createTestModels () {
     
     static fields = {
       id: attr(),
-      question: fk('Question', 'answers'),
       author: fk('User', 'answers'),
       commentCount: attr(),
       content: attr(),
@@ -126,7 +125,7 @@ export function createTestModels () {
   };
 
   return {
-    HomePage,
+    UserHomePage,
     Question,
     Answer,
     Pagination,

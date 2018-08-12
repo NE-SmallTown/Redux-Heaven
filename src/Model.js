@@ -55,6 +55,7 @@ const Model = class Model {
   
   static virtualFields = {};
   static hasRegisterModelsMap = {};
+  static querySetClass = QuerySet;
   
   static toString () {
     return `ModelClass: ${this.modelName}`;
@@ -134,7 +135,7 @@ const Model = class Model {
   initFields (fields) {
     this.finalUserProps = { ...fields };
 
-    forOwn(fields, (fieldValue, fieldName) => {
+    forOwn(fields, (_, fieldName) => {
       // In this case, we got a prop that wasn't defined as a field.
       // Assuming it's an arbitrary data field, making an instance-specific
       // descriptor for it.
@@ -257,13 +258,13 @@ const Model = class Model {
       // fieldInstance.install 的时候在 fields.js 里面已经把 model instance 里面的 author 变成了一个 id 数组的 QuerySet
       if (fieldInstance instanceof ManyToMany) {
         m2mRelations[fieldName] = userPropsField;
-        ret[fieldName] = this[fieldName].toRefArray();
+        ret[fieldName] = this[fieldName]; // 直接访问返回的就是 ids 了，不用 toRefArray()，因为返回的不是 QuerySet
 
         return;
       }
       
       if (fieldInstance instanceof TypeMap) {
-        ret[fieldName] = this[fieldName].toRefArray();
+        ret[fieldName] = this[fieldName]; // 直接访问返回的就是 ids 了，不用 toRefArray()，因为返回的不是 QuerySet
   
         return;
       }
@@ -409,7 +410,7 @@ const Model = class Model {
     return this.constructor;
   }
   
-  setOrm (orm) {
+  static setOrm (orm) {
     this.orm = orm;
   }
 
