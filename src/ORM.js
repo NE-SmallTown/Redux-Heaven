@@ -34,6 +34,7 @@ export const ORM = class ORM {
     this.registry = [];
     this.implicitThroughModels = [];
     this.installedFields = {};
+    this.hasRegisterImplicitModelsMap = {};
   }
 
   /**
@@ -48,7 +49,16 @@ export const ORM = class ORM {
   register = (...models) => models.forEach(model => {
     model.resetClassCache();
     model.setOrm(this);
-
+  
+    // 在 field 被 install 的时候需要调用 orm.get(...)，get 的可能是一个中间表，所以中间表（非 lazy 的）也需要先注册
+    forOwn(model.fields, (fieldInstance, fieldName) => {
+      if (fieldInstance instanceof ManyToMany && !this.hasRegisterImplicitModelsMap[fieldName]) {
+        this.registerManyToManyModelsFor(model, fieldInstance);
+    
+        this.hasRegisterImplicitModelsMap[fieldName] = true;
+      }
+    });
+    
     this.registry.push(model);
   });
 
@@ -73,7 +83,6 @@ export const ORM = class ORM {
       }
 
       ThroughModel.resetClassCache();
-      需要往registry里面 push?
       this.implicitThroughModels.push(ThroughModel);
     }
   }
@@ -85,6 +94,7 @@ export const ORM = class ORM {
      * @return {Model} the {@link Model} class, if found
      */
   get (modelName) {
+    console.log(this.implicitThroughModels.map(v => v.modelName), this.implicitThroughModels.length)
     const found = find(
       this.registry.concat(this.implicitThroughModels),
       model => model.modelName === modelName
@@ -103,7 +113,7 @@ export const ORM = class ORM {
     return this.registry.concat(this.implicitThroughModels);
   }
 
-  isFieldInstalled = (modelName, fieldName) => this.installedFields.hasOwnProperty(modelName)
+  isFieldInstalled = (modelName, fieldName) => this.installedFields[modelName]
     ? !!this.installedFields[modelName][fieldName]
     : false;
 
@@ -119,6 +129,7 @@ export const ORM = class ORM {
     models.forEach((model) => {
       if (!model.isSetUp) {
         const fields = model.fields;
+        
         forOwn(fields, (fieldInstance, fieldName) => {
           if (!this.isFieldInstalled(model.modelName, fieldName)) {
             // lazy 的话由于需要 userProps 来判断到底 fk 或者 many 的 toModelName 是什么
@@ -129,6 +140,7 @@ export const ORM = class ORM {
             }
           }
         });
+        
         attachQuerySetMethods(model, model.querySetClass);
         model.isSetUp = true;
       }

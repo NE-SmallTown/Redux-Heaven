@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1534081511547" clover="3.2.0">
-  <project timestamp="1534081511547" name="All files">
-    <metrics statements="863" coveredstatements="156" conditionals="346" coveredconditionals="41" methods="219" coveredmethods="46" elements="1428" coveredelements="243" complexity="0" loc="863" ncloc="863" packages="1" files="13" classes="13">
+<coverage generated="1534262192235" clover="3.2.0">
+  <project timestamp="1534262192235" name="All files">
+    <metrics statements="869" coveredstatements="106" conditionals="351" coveredconditionals="29" methods="221" coveredmethods="26" elements="1441" coveredelements="161" complexity="0" loc="869" ncloc="869" packages="1" files="13" classes="13">
       <file name="Model.js" path="/Users/wangliangjing/WebstormProjects/redux-heaven/src/Model.js">
         <metrics statements="192" coveredstatements="4" conditionals="85" coveredconditionals="0" methods="41" coveredmethods="2"/>
         <line num="36" count="0" type="stmt"/>
@@ -18,8 +18,8 @@
         <line num="97" count="0" type="stmt"/>
         <line num="107" count="0" type="stmt"/>
         <line num="111" count="0" type="stmt"/>
-        <line num="115" count="9" type="stmt"/>
-        <line num="116" count="9" type="stmt"/>
+        <line num="115" count="8" type="stmt"/>
+        <line num="116" count="8" type="stmt"/>
         <line num="120" count="0" type="stmt"/>
         <line num="128" count="0" type="stmt"/>
         <line num="132" count="0" type="stmt"/>
@@ -119,7 +119,7 @@
         <line num="396" count="0" type="stmt"/>
         <line num="399" count="0" type="stmt"/>
         <line num="410" count="0" type="stmt"/>
-        <line num="414" count="9" type="stmt"/>
+        <line num="414" count="8" type="stmt"/>
         <line num="422" count="0" type="stmt"/>
         <line num="432" count="0" type="stmt"/>
         <line num="435" count="0" type="stmt"/>
@@ -198,7 +198,7 @@
         <line num="633" count="0" type="stmt"/>
       </file>
       <file name="ORM.js" path="/Users/wangliangjing/WebstormProjects/redux-heaven/src/ORM.js">
-        <metrics statements="50" coveredstatements="35" conditionals="19" coveredconditionals="12" methods="18" coveredmethods="14"/>
+        <metrics statements="56" coveredstatements="18" conditionals="23" coveredconditionals="7" methods="20" coveredmethods="5"/>
         <line num="10" count="1" type="stmt"/>
         <line num="27" count="1" type="stmt"/>
         <line num="32" count="1" type="stmt"/>
@@ -206,49 +206,55 @@
         <line num="34" count="1" type="stmt"/>
         <line num="35" count="1" type="stmt"/>
         <line num="36" count="1" type="stmt"/>
-        <line num="48" count="1" type="stmt"/>
-        <line num="49" count="9" type="stmt"/>
-        <line num="50" count="9" type="stmt"/>
-        <line num="52" count="9" type="stmt"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="58" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="59" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="75" count="0" type="stmt"/>
-        <line num="76" count="0" type="stmt"/>
-        <line num="87" count="9" type="stmt"/>
-        <line num="89" count="46" type="stmt"/>
-        <line num="92" count="9" type="cond" truecount="2" falsecount="0"/>
-        <line num="93" count="1" type="stmt"/>
-        <line num="95" count="8" type="stmt"/>
-        <line num="99" count="1" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="49" count="1" type="stmt"/>
+        <line num="50" count="8" type="stmt"/>
+        <line num="51" count="8" type="stmt"/>
+        <line num="54" count="8" type="stmt"/>
+        <line num="55" count="41" type="cond" truecount="4" falsecount="0"/>
+        <line num="56" count="1" type="stmt"/>
+        <line num="58" count="0" type="stmt"/>
+        <line num="62" count="7" type="stmt"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="68" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="69" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="97" count="0" type="stmt"/>
+        <line num="98" count="0" type="stmt"/>
         <line num="100" count="0" type="stmt"/>
-        <line num="102" count="0" type="stmt"/>
-        <line num="105" count="41" type="cond" truecount="2" falsecount="0"/>
-        <line num="110" count="39" type="cond" truecount="2" falsecount="0"/>
-        <line num="111" count="8" type="stmt"/>
-        <line num="113" count="39" type="stmt"/>
-        <line num="118" count="1" type="stmt"/>
-        <line num="119" count="8" type="cond" truecount="1" falsecount="1"/>
-        <line num="120" count="8" type="stmt"/>
-        <line num="121" count="8" type="stmt"/>
-        <line num="122" count="41" type="cond" truecount="1" falsecount="1"/>
-        <line num="125" count="41" type="cond" truecount="2" falsecount="0"/>
-        <line num="126" count="40" type="stmt"/>
-        <line num="127" count="39" type="stmt"/>
-        <line num="131" count="7" type="stmt"/>
-        <line num="132" count="7" type="stmt"/>
-        <line num="138" count="1" type="stmt"/>
+        <line num="103" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="104" count="0" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="110" count="0" type="stmt"/>
+        <line num="111" count="0" type="stmt"/>
+        <line num="113" count="0" type="stmt"/>
+        <line num="116" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="121" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="124" count="0" type="stmt"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="130" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="133" count="0" type="stmt"/>
+        <line num="134" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="137" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="138" count="0" type="stmt"/>
         <line num="139" count="0" type="stmt"/>
-        <line num="140" count="0" type="stmt"/>
-        <line num="142" count="0" type="stmt"/>
         <line num="144" count="0" type="stmt"/>
-        <line num="148" count="0" type="stmt"/>
-        <line num="152" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="153" count="1" type="stmt"/>
-        <line num="156" count="0" type="stmt"/>
-        <line num="163" count="1" type="stmt"/>
-        <line num="171" count="0" type="stmt"/>
-        <line num="179" count="0" type="stmt"/>
+        <line num="145" count="0" type="stmt"/>
+        <line num="151" count="0" type="stmt"/>
+        <line num="152" count="0" type="stmt"/>
+        <line num="153" count="0" type="stmt"/>
+        <line num="155" count="0" type="stmt"/>
+        <line num="157" count="0" type="stmt"/>
+        <line num="161" count="0" type="stmt"/>
+        <line num="165" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="166" count="0" type="stmt"/>
+        <line num="169" count="0" type="stmt"/>
+        <line num="176" count="0" type="stmt"/>
+        <line num="184" count="0" type="stmt"/>
+        <line num="192" count="0" type="stmt"/>
       </file>
       <file name="QuerySet.js" path="/Users/wangliangjing/WebstormProjects/redux-heaven/src/QuerySet.js">
         <metrics statements="47" coveredstatements="2" conditionals="12" coveredconditionals="0" methods="21" coveredmethods="0"/>
@@ -301,7 +307,7 @@
         <line num="259" count="1" type="stmt"/>
       </file>
       <file name="Session.js" path="/Users/wangliangjing/WebstormProjects/redux-heaven/src/Session.js">
-        <metrics statements="23" coveredstatements="1" conditionals="7" coveredconditionals="0" methods="7" coveredmethods="0"/>
+        <metrics statements="23" coveredstatements="1" conditionals="8" coveredconditionals="0" methods="7" coveredmethods="0"/>
         <line num="14" count="1" type="stmt"/>
         <line num="26" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
@@ -446,11 +452,11 @@
         <line num="97" count="0" type="stmt"/>
       </file>
       <file name="descriptors.js" path="/Users/wangliangjing/WebstormProjects/redux-heaven/src/descriptors.js">
-        <metrics statements="77" coveredstatements="7" conditionals="22" coveredconditionals="0" methods="19" coveredmethods="4"/>
-        <line num="11" count="32" type="stmt"/>
+        <metrics statements="77" coveredstatements="7" conditionals="22" coveredconditionals="0" methods="19" coveredmethods="0"/>
+        <line num="11" count="1" type="stmt"/>
         <line num="13" count="0" type="stmt"/>
         <line num="17" count="0" type="stmt"/>
-        <line num="24" count="7" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
         <line num="26" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
         <line num="28" count="0" type="stmt"/>
@@ -462,13 +468,13 @@
         <line num="40" count="0" type="stmt"/>
         <line num="42" count="0" type="stmt"/>
         <line num="45" count="0" type="stmt"/>
-        <line num="50" count="5" type="stmt"/>
+        <line num="50" count="1" type="stmt"/>
         <line num="52" count="0" type="stmt"/>
         <line num="53" count="0" type="stmt"/>
         <line num="54" count="0" type="stmt"/>
         <line num="61" count="0" type="stmt"/>
         <line num="64" count="0" type="stmt"/>
-        <line num="68" count="2" type="stmt"/>
+        <line num="68" count="1" type="stmt"/>
         <line num="70" count="0" type="stmt"/>
         <line num="71" count="0" type="stmt"/>
         <line num="72" count="0" type="stmt"/>
@@ -526,57 +532,57 @@
         <line num="195" count="1" type="stmt"/>
       </file>
       <file name="fields.js" path="/Users/wangliangjing/WebstormProjects/redux-heaven/src/fields.js">
-        <metrics statements="101" coveredstatements="43" conditionals="51" coveredconditionals="23" methods="24" coveredmethods="16"/>
-        <line num="30" count="34" type="cond" truecount="2" falsecount="0"/>
-        <line num="32" count="34" type="cond" truecount="1" falsecount="1"/>
+        <metrics statements="101" coveredstatements="27" conditionals="51" coveredconditionals="20" methods="24" coveredmethods="12"/>
+        <line num="30" count="35" type="cond" truecount="2" falsecount="0"/>
+        <line num="32" count="35" type="cond" truecount="1" falsecount="1"/>
         <line num="33" count="0" type="stmt"/>
-        <line num="38" count="32" type="stmt"/>
-        <line num="48" count="19" type="stmt"/>
-        <line num="51" count="19" type="cond" truecount="4" falsecount="0"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="48" count="13" type="stmt"/>
+        <line num="51" count="13" type="cond" truecount="4" falsecount="0"/>
         <line num="52" count="1" type="stmt"/>
         <line num="53" count="1" type="stmt"/>
-        <line num="54" count="18" type="cond" truecount="2" falsecount="2"/>
+        <line num="54" count="12" type="cond" truecount="3" falsecount="1"/>
         <line num="55" count="0" type="stmt"/>
         <line num="57" count="0" type="stmt"/>
         <line num="58" count="0" type="stmt"/>
         <line num="59" count="0" type="stmt"/>
         <line num="60" count="0" type="stmt"/>
-        <line num="75" count="18" type="cond" truecount="1" falsecount="1"/>
+        <line num="75" count="12" type="cond" truecount="1" falsecount="1"/>
         <line num="77" count="0" type="stmt"/>
-        <line num="81" count="18" type="stmt"/>
-        <line num="82" count="18" type="stmt"/>
-        <line num="85" count="19" type="cond" truecount="6" falsecount="1"/>
-        <line num="86" count="0" type="stmt"/>
-        <line num="88" count="0" type="stmt"/>
-        <line num="96" count="9" type="cond" truecount="1" falsecount="1"/>
+        <line num="81" count="12" type="stmt"/>
+        <line num="82" count="12" type="stmt"/>
+        <line num="85" count="13" type="cond" truecount="7" falsecount="0"/>
+        <line num="86" count="1" type="stmt"/>
+        <line num="88" count="1" type="stmt"/>
+        <line num="96" count="1" type="cond" truecount="1" falsecount="1"/>
         <line num="97" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="98" count="0" type="stmt"/>
         <line num="101" count="0" type="stmt"/>
-        <line num="104" count="9" type="stmt"/>
-        <line num="108" count="19" type="stmt"/>
-        <line num="112" count="25" type="cond" truecount="1" falsecount="1"/>
+        <line num="104" count="1" type="stmt"/>
+        <line num="108" count="13" type="stmt"/>
+        <line num="112" count="13" type="cond" truecount="1" falsecount="1"/>
         <line num="113" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="114" count="0" type="stmt"/>
         <line num="117" count="0" type="stmt"/>
-        <line num="120" count="25" type="stmt"/>
-        <line num="124" count="18" type="stmt"/>
-        <line num="128" count="0" type="stmt"/>
-        <line num="129" count="0" type="stmt"/>
-        <line num="130" count="0" type="stmt"/>
-        <line num="134" count="5" type="stmt"/>
-        <line num="142" count="5" type="stmt"/>
-        <line num="145" count="5" type="stmt"/>
-        <line num="146" count="5" type="stmt"/>
-        <line num="151" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="120" count="13" type="stmt"/>
+        <line num="124" count="12" type="stmt"/>
+        <line num="128" count="1" type="stmt"/>
+        <line num="129" count="1" type="stmt"/>
+        <line num="130" count="1" type="stmt"/>
+        <line num="134" count="0" type="stmt"/>
+        <line num="142" count="0" type="stmt"/>
+        <line num="145" count="0" type="stmt"/>
+        <line num="146" count="0" type="stmt"/>
+        <line num="151" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="152" count="0" type="stmt"/>
-        <line num="158" count="5" type="stmt"/>
-        <line num="164" count="5" type="stmt"/>
-        <line num="169" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="158" count="0" type="stmt"/>
+        <line num="164" count="0" type="stmt"/>
+        <line num="169" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="170" count="0" type="stmt"/>
         <line num="176" count="0" type="stmt"/>
-        <line num="179" count="5" type="stmt"/>
-        <line num="185" count="5" type="stmt"/>
-        <line num="186" count="5" type="stmt"/>
+        <line num="179" count="0" type="stmt"/>
+        <line num="185" count="0" type="stmt"/>
+        <line num="186" count="0" type="stmt"/>
         <line num="194" count="0" type="stmt"/>
         <line num="195" count="0" type="stmt"/>
         <line num="196" count="0" type="stmt"/>
@@ -591,9 +597,9 @@
         <line num="221" count="0" type="stmt"/>
         <line num="224" count="0" type="stmt"/>
         <line num="235" count="0" type="stmt"/>
-        <line num="243" count="1" type="stmt"/>
-        <line num="244" count="1" type="cond" truecount="2" falsecount="0"/>
-        <line num="245" count="1" type="stmt"/>
+        <line num="243" count="0" type="stmt"/>
+        <line num="244" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="245" count="0" type="stmt"/>
         <line num="248" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="249" count="0" type="stmt"/>
         <line num="250" count="0" type="stmt"/>
@@ -615,15 +621,15 @@
         <line num="318" count="0" type="stmt"/>
         <line num="332" count="0" type="stmt"/>
         <line num="341" count="0" type="stmt"/>
-        <line num="347" count="2" type="stmt"/>
-        <line num="349" count="2" type="stmt"/>
-        <line num="355" count="2" type="stmt"/>
-        <line num="356" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="347" count="0" type="stmt"/>
+        <line num="349" count="0" type="stmt"/>
+        <line num="355" count="0" type="stmt"/>
+        <line num="356" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="357" count="0" type="stmt"/>
         <line num="364" count="0" type="stmt"/>
-        <line num="367" count="2" type="stmt"/>
-        <line num="373" count="2" type="stmt"/>
-        <line num="402" count="34" type="stmt"/>
+        <line num="367" count="0" type="stmt"/>
+        <line num="373" count="0" type="stmt"/>
+        <line num="402" count="35" type="stmt"/>
         <line num="446" count="5" type="stmt"/>
         <line num="448" count="1" type="stmt"/>
         <line num="520" count="2" type="stmt"/>
@@ -850,37 +856,37 @@
         <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       </file>
       <file name="utils.js" path="/Users/wangliangjing/WebstormProjects/redux-heaven/src/utils.js">
-        <metrics statements="52" coveredstatements="26" conditionals="24" coveredconditionals="4" methods="15" coveredmethods="5"/>
+        <metrics statements="52" coveredstatements="9" conditionals="24" coveredconditionals="0" methods="15" coveredmethods="2"/>
         <line num="29" count="1" type="stmt"/>
         <line num="41" count="1" type="stmt"/>
         <line num="54" count="1" type="stmt"/>
-        <line num="56" count="77" type="stmt"/>
+        <line num="56" count="1" type="stmt"/>
         <line num="57" count="0" type="stmt"/>
         <line num="60" count="1" type="stmt"/>
         <line num="61" count="0" type="stmt"/>
         <line num="63" count="0" type="stmt"/>
         <line num="66" count="1" type="stmt"/>
-        <line num="67" count="7" type="stmt"/>
-        <line num="69" count="7" type="stmt"/>
-        <line num="70" count="7" type="stmt"/>
-        <line num="71" count="7" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
         <line num="75" count="1" type="stmt"/>
-        <line num="76" count="7" type="stmt"/>
-        <line num="81" count="7" type="stmt"/>
-        <line num="82" count="7" type="stmt"/>
-        <line num="83" count="77" type="stmt"/>
-        <line num="84" count="77" type="stmt"/>
-        <line num="85" count="77" type="stmt"/>
-        <line num="86" count="77" type="cond" truecount="1" falsecount="1"/>
-        <line num="87" count="77" type="cond" truecount="1" falsecount="1"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="82" count="0" type="stmt"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="86" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="87" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="88" count="0" type="stmt"/>
         <line num="89" count="0" type="stmt"/>
         <line num="90" count="0" type="stmt"/>
-        <line num="91" count="77" type="cond" truecount="1" falsecount="1"/>
-        <line num="92" count="77" type="stmt"/>
-        <line num="93" count="77" type="stmt"/>
-        <line num="96" count="77" type="cond" truecount="1" falsecount="1"/>
-        <line num="97" count="77" type="stmt"/>
+        <line num="91" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="92" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="96" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="97" count="0" type="stmt"/>
         <line num="111" count="1" type="stmt"/>
         <line num="112" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="113" count="0" type="stmt"/>

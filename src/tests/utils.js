@@ -65,7 +65,7 @@ export function createTestModels () {
   };
   
   const Topic = class Topic extends Model {
-    static modelName = 'Reply';
+    static modelName = 'Topic';
     
     static fields = {
       id: attr(),

@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">49.12% </span>
+        <span class="strong">19.3% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>28/57</span>
+        <span class='fraction'>11/57</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">16.67% </span>
+        <span class="strong">0% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>4/24</span>
+        <span class='fraction'>0/24</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">33.33% </span>
+        <span class="strong">13.33% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>5/15</span>
+        <span class='fraction'>2/15</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">50% </span>
+        <span class="strong">17.31% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>26/52</span>
+        <span class='fraction'>9/52</span>
       </div>
     </div>
     <p class="quiet">
@@ -275,7 +275,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">77x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -286,37 +286,37 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">77x</span>
-<span class="cline-any cline-yes">77x</span>
-<span class="cline-any cline-yes">77x</span>
-<span class="cline-any cline-yes">77x</span>
-<span class="cline-any cline-yes">77x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">77x</span>
-<span class="cline-any cline-yes">77x</span>
-<span class="cline-any cline-yes">77x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">77x</span>
-<span class="cline-any cline-yes">77x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -434,7 +434,7 @@ const m2mName = (declarationModelName, toModelName) =&gt; declarationModelName +
  * @param  {string} declarationModelName - the name of the model where the relation was declared
  * @return {string} the field name in the through model for `declarationModelName`'s foreign key.
  */
-const m2mFromFieldName = <span class="fstat-no" title="function not covered" >de</span>clarationModelName =&gt; <span class="cstat-no" title="statement not covered" >declarationModelName + 'Id';</span>
+const m2mFromFieldName = declarationModelName =&gt; declarationModelName + 'Id';
 &nbsp;
 /**
  * Returns the fieldname that saves a foreign key in a many-to-many through model to the
@@ -449,7 +449,7 @@ const m2mFromFieldName = <span class="fstat-no" title="function not covered" >de
  */
 const m2mToFieldName = m2mFromFieldName;
 &nbsp;
-const querySetDelegatorFactory = methodName =&gt; <span class="fstat-no" title="function not covered" >fu</span>nction (...args) {
+const querySetDelegatorFactory = <span class="fstat-no" title="function not covered" >me</span>thodName =&gt; <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >fu</span>nction (...args) {</span>
 <span class="cstat-no" title="statement not covered" >  return this.getQuerySet()[methodName](...args);</span>
 };
 &nbsp;
@@ -459,38 +459,38 @@ const querySetGetterDelegatorFactory = <span class="fstat-no" title="function no
 <span class="cstat-no" title="statement not covered" >  return qs[getterName];</span>
 };
 &nbsp;
-const forEachSuperClass = (subClass, func) =&gt; {
-  let currClass = subClass;
+const forEachSuperClass = <span class="fstat-no" title="function not covered" >(s</span>ubClass, func) =&gt; {
+  let currClass = <span class="cstat-no" title="statement not covered" >subClass;</span>
   
-  while (currClass !== Function.prototype) {
-    func(currClass);
-    currClass = Object.getPrototypeOf(currClass);
+<span class="cstat-no" title="statement not covered" >  while (currClass !== Function.prototype) {</span>
+<span class="cstat-no" title="statement not covered" >    func(currClass);</span>
+<span class="cstat-no" title="statement not covered" >    currClass = Object.getPrototypeOf(currClass);</span>
   }
 };
 &nbsp;
-const attachQuerySetMethods = (modelClass, querySetClass) =&gt; {
-  const leftToDefine = querySetClass.sharedMethods.slice();
+const attachQuerySetMethods = <span class="fstat-no" title="function not covered" >(m</span>odelClass, querySetClass) =&gt; {
+  const leftToDefine = <span class="cstat-no" title="statement not covered" >querySetClass.sharedMethods.slice();</span>
 &nbsp;
   // There is no way to get a property descriptor for the whole prototype chain;
   // only from an objects own properties. Therefore we traverse the whole prototype
   // chain for querySet.
-  forEachSuperClass(querySetClass, (cls) =&gt; {
-    for (let i = 0; i &lt; leftToDefine.length; i++) {
-      let defined = false;
-      const methodName = leftToDefine[i];
-      const descriptor = Object.getOwnPropertyDescriptor(cls.prototype, methodName);
-      <span class="missing-if-branch" title="else path not taken" >E</span>if (typeof descriptor !== 'undefined') {
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof descriptor.get !== 'undefined') {
+<span class="cstat-no" title="statement not covered" >  forEachSuperClass(querySetClass, <span class="fstat-no" title="function not covered" >(c</span>ls) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    for (let i = 0; i &lt; leftToDefine.length; i++) {</span>
+      let defined = <span class="cstat-no" title="statement not covered" >false;</span>
+      const methodName = <span class="cstat-no" title="statement not covered" >leftToDefine[i];</span>
+      const descriptor = <span class="cstat-no" title="statement not covered" >Object.getOwnPropertyDescriptor(cls.prototype, methodName);</span>
+<span class="cstat-no" title="statement not covered" >      if (typeof descriptor !== 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >        if (typeof descriptor.get !== 'undefined') {</span>
 <span class="cstat-no" title="statement not covered" >          descriptor.get = querySetGetterDelegatorFactory(methodName);</span>
 <span class="cstat-no" title="statement not covered" >          Object.defineProperty(modelClass, methodName, descriptor);</span>
 <span class="cstat-no" title="statement not covered" >          defined = true;</span>
-        } else <span class="missing-if-branch" title="else path not taken" >E</span>if (typeof descriptor.value === 'function') {
-          modelClass[methodName] = querySetDelegatorFactory(methodName);
-          defined = true;
+        } else <span class="cstat-no" title="statement not covered" >if (typeof descriptor.value === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >          modelClass[methodName] = querySetDelegatorFactory(methodName);</span>
+<span class="cstat-no" title="statement not covered" >          defined = true;</span>
         }
       }
-      <span class="missing-if-branch" title="else path not taken" >E</span>if (defined) {
-        leftToDefine.splice(i--, 1);
+<span class="cstat-no" title="statement not covered" >      if (defined) {</span>
+<span class="cstat-no" title="statement not covered" >        leftToDefine.splice(i--, 1);</span>
       }
     }
   });
@@ -574,7 +574,7 @@ export {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sun Aug 12 2018 21:45:11 GMT+0800 (CST)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Aug 14 2018 23:56:32 GMT+0800 (CST)
 </div>
 </div>
 <script src="prettify.js"></script>

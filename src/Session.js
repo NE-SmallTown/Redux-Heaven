@@ -22,7 +22,7 @@ const Session = class Session {
    * @param  {Object} [batchToken] - used by the backend to identify objects that can be
    *                                 mutated.
    */
-  constructor (orm, db, state, withMutations, batchToken = getBatchToken()) {
+  constructor (orm, db, state, withMutations = false, batchToken = getBatchToken()) {
     this.orm = orm;
     this.db = db;
     this.state = state || db.getState();
