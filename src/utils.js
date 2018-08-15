@@ -26,7 +26,7 @@ import difference from 'lodash/difference';
  * @param  {string} toModelName - the model name where the many-to-many relation was declared on
  * @return {string} The branch name for the many-to-many relation.
  */
-const m2mName = (declarationModelName, toModelName) => declarationModelName + '-' + toModelName;
+export const m2mName = (declarationModelName, toModelName) => declarationModelName + '-' + toModelName;
 
 /**
  * Returns the fieldname that saves a foreign key to the
@@ -38,7 +38,15 @@ const m2mName = (declarationModelName, toModelName) => declarationModelName + '-
  * @param  {string} declarationModelName - the name of the model where the relation was declared
  * @return {string} the field name in the through model for `declarationModelName`'s foreign key.
  */
-const m2mFromFieldName = declarationModelName => declarationModelName + 'Id';
+export const m2mFromFieldName = declarationModelName => declarationModelName + 'Id';
+
+/**
+ * Returns the toModelName of `fk(toModel, toModelName)` in the ThroughModel
+ * Because we don't have a toModelName for the fk in ThroughModel, we should generate one by some rules
+ *
+ * Example: ('Article-User', 'articleId') => 'thfk-Article-User-articleId'     th means 'ThroughModel fk'
+ */
+export const throughModelFkFieldToModelName = (modelName, fieldName) => 'thfk-' + modelName + '-' + fieldName;
 
 /**
  * Returns the fieldname that saves a foreign key in a many-to-many through model to the
@@ -51,19 +59,19 @@ const m2mFromFieldName = declarationModelName => declarationModelName + 'Id';
  *                                   declaration.
  * @return {string} the field name in the through model for `otherModelName`'s foreign key..
  */
-const m2mToFieldName = m2mFromFieldName;
+export const m2mToFieldName = m2mFromFieldName;
 
-const querySetDelegatorFactory = methodName => function (...args) {
+export const querySetDelegatorFactory = methodName => function (...args) {
   return this.getQuerySet()[methodName](...args);
 };
 
-const querySetGetterDelegatorFactory = getterName => function () {
+export const querySetGetterDelegatorFactory = getterName => function () {
   const qs = this.getQuerySet();
   
   return qs[getterName];
 };
 
-const forEachSuperClass = (subClass, func) => {
+export const forEachSuperClass = (subClass, func) => {
   let currClass = subClass;
   
   while (currClass !== Function.prototype) {
@@ -72,7 +80,7 @@ const forEachSuperClass = (subClass, func) => {
   }
 };
 
-const attachQuerySetMethods = (modelClass, querySetClass) => {
+export const attachQuerySetMethods = (modelClass, querySetClass) => {
   const leftToDefine = querySetClass.sharedMethods.slice();
 
   // There is no way to get a property descriptor for the whole prototype chain;
@@ -108,7 +116,7 @@ const attachQuerySetMethods = (modelClass, querySetClass) => {
  * @param  {*} entity - either a Model instance or an id value
  * @return {*} the id value of `entity`
  */
-const normalizeEntity = entity => {
+export const normalizeEntity = entity => {
   if (!entity) {
     throw Error(`You must pass entity but got ${entity}`);
   }
@@ -116,12 +124,12 @@ const normalizeEntity = entity => {
   return entity.getId ? entity.getId() : entity;
 };
 
-const reverseFieldErrorMessage = (modelName, fieldName, toModelName, backwardsFieldName) => `
+export const reverseFieldErrorMessage = (modelName, fieldName, toModelName, backwardsFieldName) => `
   Reverse field ${backwardsFieldName} already defined on model ${toModelName}.
   To fix, set a custom related name on ${modelName}.${fieldName}.
 `;
 
-function objectShallowEquals (a, b) {
+export function objectShallowEquals (a, b) {
   let keysInA = 0;
 
   // eslint-disable-next-line consistent-return
@@ -135,7 +143,7 @@ function objectShallowEquals (a, b) {
   return keysInA === Object.keys(b).length;
 }
 
-function arrayDiffActions (sourceArr, targetArr) {
+export function arrayDiffActions (sourceArr, targetArr) {
   const itemsInBoth = intersection(sourceArr, targetArr);
   const deleteItems = difference(sourceArr, itemsInBoth);
   const addItems = difference(targetArr, itemsInBoth);
@@ -149,7 +157,7 @@ function arrayDiffActions (sourceArr, targetArr) {
   return null;
 }
 
-function putCandidateIdKeyIntoObject (obj, idAttribute, candidateIdKes) {
+export function putCandidateIdKeyIntoObject (obj, idAttribute, candidateIdKes) {
   if (!obj[idAttribute]) {
     for (const key of candidateIdKes) {
       if (obj[key]) {
@@ -159,16 +167,3 @@ function putCandidateIdKeyIntoObject (obj, idAttribute, candidateIdKes) {
     }
   }
 }
-
-export {
-  attachQuerySetMethods,
-  m2mName,
-  m2mFromFieldName,
-  m2mToFieldName,
-  normalizeEntity,
-  reverseFieldErrorMessage,
-  objectShallowEquals,
-  includes,
-  arrayDiffActions,
-  putCandidateIdKeyIntoObject
-};

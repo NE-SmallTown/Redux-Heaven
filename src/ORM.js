@@ -5,7 +5,7 @@ import Session from './Session';
 import Model from './Model';
 import { createDatabase as defaultcreateDatabase } from './dataBase';
 import { ForeignKey, ManyToMany, attr } from './fields';
-import { m2mName, attachQuerySetMethods, m2mToFieldName, m2mFromFieldName } from './utils';
+import { m2mName, attachQuerySetMethods, m2mToFieldName, m2mFromFieldName, throughModelFkFieldToModelName } from './utils';
 
 const ORM_DEFAULTS = {
   createDatabase: defaultcreateDatabase
@@ -69,16 +69,19 @@ export const ORM = class ORM {
       const toModelName = fieldInstance.lazy
         ? fieldInstance.toModelName(userProp)[0] : fieldInstance.toModelName;
         
+      const modelName = m2mName(thisModelName, toModelName);
+      const fromFieldName = [m2mFromFieldName(thisModelName)];
+      const toFieldName = [m2mToFieldName(toModelName)];
       class ThroughModel extends Model {
           // 如 thisModelName = 'Article', toModelName = 'User', 所以结果为 'Article-User'
-          static modelName = m2mName(thisModelName, toModelName);
+          static modelName = modelName;
 
           static fields = {
             id: attr(),
             // 如 'articleId'
-            [m2mFromFieldName(thisModelName)]: new ForeignKey(thisModelName),
+            [fromFieldName]: new ForeignKey(thisModelName, throughModelFkFieldToModelName(modelName, fromFieldName)),
             // 如 'userId'
-            [m2mToFieldName(toModelName)]: new ForeignKey(toModelName)
+            [toFieldName]: new ForeignKey(toModelName, throughModelFkFieldToModelName(modelName, toFieldName))
           }
       }
 
@@ -94,7 +97,6 @@ export const ORM = class ORM {
      * @return {Model} the {@link Model} class, if found
      */
   get (modelName) {
-    console.log(this.implicitThroughModels.map(v => v.modelName), this.implicitThroughModels.length)
     const found = find(
       this.registry.concat(this.implicitThroughModels),
       model => model.modelName === modelName
