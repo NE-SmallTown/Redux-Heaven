@@ -589,7 +589,7 @@ const Model = class Model {
     }
 
     // 对于不属于 fileds 里面的属性，需要直接加到 model 实例上
-    this.initFields(Object.assign({}, this.finalUserProps, mergeObj));
+    this.initFields({ ...this.finalUserProps, mergeObj });
 
     // 对于 many，需要同步
     this._refreshMany2Many(m2mRelations); // eslint-disable-line no-underscore-dangle

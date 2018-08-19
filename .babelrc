@@ -4,10 +4,21 @@
     "syntax-class-properties",
     "transform-decorators-legacy",
     "transform-object-rest-spread",
-    "transform-export-extensions"
+    "transform-export-extensions",
+    ["transform-define", "./babel-define-plugin.config.js"]
   ],
   "presets": [["env", { "modules": false }], "react"],
   "env": {
+    "development": {
+      "presets": [["env"], "react"],
+      "plugins": [
+        "transform-class-properties",
+        "syntax-class-properties",
+        "transform-decorators-legacy",
+        "transform-object-rest-spread",
+        "transform-export-extensions"
+      ]
+    },
     "test": {
       "presets": [["env"], "react"],
       "plugins": [
@@ -15,10 +26,7 @@
         "syntax-class-properties",
         "transform-decorators-legacy",
         "transform-object-rest-spread",
-        "transform-export-extensions",
-        "transform-define", {
-          "__DEV__": true
-        }
+        "transform-export-extensions"
       ]
     }
   }

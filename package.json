@@ -25,8 +25,7 @@
     "flow": "flow",
     "lint": "eslint src/",
     "lint:fix": "npm run lint -- --fix",
-    "test": "NODE_ENV=development && jest --config=jest.conf.json --coverage --no-cache",
-    "test:dev": "npm run test -- --watch",
+    "test:dev": "NODE_ENV=development jest --config=jest.conf.json --coverage --no-cache",
     "codecov": "cat coverage/*/lcov.info | codecov"
   },
   "repository": {

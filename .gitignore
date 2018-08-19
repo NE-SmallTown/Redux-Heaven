@@ -2,9 +2,11 @@ node_modules
 
 .idea
 
-/lib
+./lib
 
 package-lock.json
+
+./coverage
 
 npm-debug.log
 
