@@ -1,3 +1,6 @@
+import isArray from 'lodash/isArray';
+import isPlainObject from 'lodash/isPlainObject';
+
 import ORM from '../ORM';
 import Model from '../Model';
 import { UsersMock, AdMock, TopicMock, QuestionMock, QAnswerMock, PaginationMock, HomePageMock, CommentsMock, AnswerMock } from './mockUtils';
@@ -160,9 +163,15 @@ export function createTestSessionWithData (orm = createTestORM()) {
     [AdMock, Ad],
     [TopicMock, Topic],
     [QAnswerMock, QAnswer]
-  ].forEach(([mockDataArr, mockModel]) =>
-    mockDataArr.forEach(mockData => mockModel.create(mockData))
-  );
+  ].forEach(([mockData, mockModel]) => {
+    if (isArray(mockData)) {
+      mockData.forEach(data => mockModel.create(data))
+    } else if (isPlainObject(mockData)) {
+      mockModel.create(mockData);
+    } else {
+      throw Error(`Mock data must be an array or object but received ${mockData}`)
+    }
+  });
 
   return {
     session: orm.initSession(state),

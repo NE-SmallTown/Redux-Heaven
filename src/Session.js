@@ -34,6 +34,8 @@ const Session = class Session {
       Object.defineProperty(this, model.modelName, {
         get: () => model
       });
+  
+      model.connect(this);
     });
   }
 

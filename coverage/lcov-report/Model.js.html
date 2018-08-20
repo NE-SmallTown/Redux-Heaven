@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">2.07% </span>
+        <span class="strong">5.7% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>4/193</span>
+        <span class='fraction'>11/193</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">1.18% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/85</span>
+        <span class='fraction'>1/85</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">4.88% </span>
+        <span class="strong">14.63% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>2/41</span>
+        <span class='fraction'>6/41</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">2.08% </span>
+        <span class="strong">5.73% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>4/192</span>
+        <span class='fraction'>11/192</span>
       </div>
     </div>
     <p class="quiet">
@@ -764,7 +764,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -778,13 +778,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -792,7 +790,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -903,12 +903,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1403,8 +1403,8 @@ const Model = class Model {
    *
    * @return {string} The id attribute of this {@link Model}.
    */
-<span class="fstat-no" title="function not covered" >  st</span>atic get idAttribute () {
-<span class="cstat-no" title="statement not covered" >    return this.session.db.describe(this.modelName).idAttribute;</span>
+  static get idAttribute () {
+    return this.session.db.describe(this.modelName).idAttribute;
   }
   
 <span class="fstat-no" title="function not covered" >  st</span>atic get candidateIdKes () {
@@ -1417,12 +1417,12 @@ const Model = class Model {
    * @private
    * @param  {Session} session - The session to connect to.
    */
-<span class="fstat-no" title="function not covered" >  st</span>atic connect (session) {
-<span class="cstat-no" title="statement not covered" >    if (!(session instanceof Session)) {</span>
+  static connect (session) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!(session instanceof Session)) {
 <span class="cstat-no" title="statement not covered" >      throw Error('A model can only connect to a Session instance.');</span>
     }
     
-<span class="cstat-no" title="statement not covered" >    this._session = session;</span>
+    this._session = session;
   }
   
   /**
@@ -1431,8 +1431,8 @@ const Model = class Model {
    * @private
    * @return {Session} The current {@link Session} instance.
    */
-<span class="fstat-no" title="function not covered" >  st</span>atic get session () {
-<span class="cstat-no" title="statement not covered" >    return this._session;</span>
+  static get session () {
+    return this._session;
   }
   
 <span class="fstat-no" title="function not covered" >  st</span>atic getQuerySet () {
@@ -1542,13 +1542,13 @@ const Model = class Model {
    * @param  userProps - the new {@link Model}'s properties.
    * @return {Model} a new {@link Model} instance.
    */
-<span class="fstat-no" title="function not covered" >  st</span>atic create (userProps) {
-    const ret = <span class="cstat-no" title="statement not covered" >{ ...userProps };</span>
-    const m2mRelations = <span class="cstat-no" title="statement not covered" >{};</span>
+  static create (userProps) {
+    const ret = { ...userProps };
+    const m2mRelations = {};
 &nbsp;
     // 没有 idAttribute 对应的字段时，需要将 candidateIdKes 中的转移到 idAttribute 上
     // 总之就是确保 model 上有 idAttribute 对应的字段，后面的查删改都直接以 idAttribute 为准就行了
-<span class="cstat-no" title="statement not covered" >    putCandidateIdKeyIntoObject(ret, this.idAttribute, this.candidateIdKes);</span>
+    putCandidateIdKeyIntoObject(ret, this.idAttribute, this.candidateIdKes);
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    forOwn(this.fields, <span class="fstat-no" title="function not covered" >(f</span>ieldInstance, fieldName) =&gt; {</span>
       const userPropsHasFieldKey = <span class="cstat-no" title="statement not covered" >userProps.hasOwnProperty(fieldName);</span>
@@ -1972,7 +1972,7 @@ export default Model;
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Sun Aug 19 2018 23:26:04 GMT+0800 (CST)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Aug 20 2018 23:14:33 GMT+0800 (CST)
 </div>
 </div>
 <script src="prettify.js"></script>
