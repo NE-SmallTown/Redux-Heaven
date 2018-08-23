@@ -94,6 +94,7 @@ export const createDatabase = schemaSpec => {
         }
       }, {});
     },
-    execute: (...args) => execute(tables, ...args)
+    execute: (...args) => execute(tables, ...args),
+    getTableByTableName: tableName => tables[tableName]
   };
 };

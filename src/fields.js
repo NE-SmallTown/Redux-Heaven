@@ -27,6 +27,7 @@ import {
  */
 export class Attribute {
   constructor (opts) {
+    this.lazy = false;
     this.opts = (opts || {});
 
     if (this.opts.hasOwnProperty('getDefault')) {

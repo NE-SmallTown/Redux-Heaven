@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">5.7% </span>
+        <span class="strong">10.88% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>11/193</span>
+        <span class='fraction'>21/193</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">1.18% </span>
+        <span class="strong">7.06% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>1/85</span>
+        <span class='fraction'>6/85</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">14.63% </span>
+        <span class="strong">19.51% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>6/41</span>
+        <span class='fraction'>8/41</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">5.73% </span>
+        <span class="strong">10.94% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>11/192</span>
+        <span class='fraction'>21/192</span>
       </div>
     </div>
     <p class="quiet">
@@ -768,7 +768,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -792,7 +792,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -910,35 +910,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1404,11 +1404,11 @@ const Model = class Model {
    * @return {string} The id attribute of this {@link Model}.
    */
   static get idAttribute () {
-    return this.session.db.describe(this.modelName).idAttribute;
+    return this.session.db.getTableByTableName(this.modelName).idAttribute;
   }
   
-<span class="fstat-no" title="function not covered" >  st</span>atic get candidateIdKes () {
-<span class="cstat-no" title="statement not covered" >    return this.session.db.describe(this.modelName).candidateIdKes;</span>
+  static get candidateIdKes () {
+    return this.session.db.getTableByTableName(this.modelName).candidateIdKes;
   }
   
   /**
@@ -1550,11 +1550,11 @@ const Model = class Model {
     // 总之就是确保 model 上有 idAttribute 对应的字段，后面的查删改都直接以 idAttribute 为准就行了
     putCandidateIdKeyIntoObject(ret, this.idAttribute, this.candidateIdKes);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    forOwn(this.fields, <span class="fstat-no" title="function not covered" >(f</span>ieldInstance, fieldName) =&gt; {</span>
-      const userPropsHasFieldKey = <span class="cstat-no" title="statement not covered" >userProps.hasOwnProperty(fieldName);</span>
-      const userPropsField = <span class="cstat-no" title="statement not covered" >userProps[fieldName];</span>
+    forOwn(this.fields, (fieldInstance, fieldName) =&gt; {
+      const userPropsHasFieldKey = userProps.hasOwnProperty(fieldName);
+      const userPropsField = userProps[fieldName];
   
-<span class="cstat-no" title="statement not covered" >      if (fieldInstance instanceof ManyToMany &amp;&amp; !this.hasRegisterModelsMap[fieldName]) {</span>
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (fieldInstance instanceof ManyToMany &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >!this.hasRegisterModelsMap[fieldName])</span> {
 <span class="cstat-no" title="statement not covered" >        this.orm.registerManyToManyModelsFor(this, fieldInstance, userPropsField);</span>
     
 <span class="cstat-no" title="statement not covered" >        this.hasRegisterModelsMap[fieldName] = true;</span>
@@ -1562,23 +1562,23 @@ const Model = class Model {
   
       // 可以多传在 schema 里没有的 field，但是不能少传
       // TODO 应该是可以少传的，因为 schema 应该只是最大的集合而已
-<span class="cstat-no" title="statement not covered" >      if (!userPropsHasFieldKey) {</span>
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!userPropsHasFieldKey) {
 <span class="cstat-no" title="statement not covered" >        warning(</span>
           false,
           `The Model ${this.modelName} has field key: ${fieldName}, but the object which you pass doesn't have the key`
         );
       }
-  
-<span class="cstat-no" title="statement not covered" >      if (fieldInstance.lazy === undefined) {</span>
+      
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (fieldInstance.lazy === undefined) {
 <span class="cstat-no" title="statement not covered" >        throw Error(`modelInstance.lazy can't be undefined, please file an issue!`);</span>
-      } else <span class="cstat-no" title="statement not covered" >if (fieldInstance.lazy) {</span>
+      } else <span class="missing-if-branch" title="if path not taken" >I</span>if (fieldInstance.lazy) {
         // 在 field 实例上设置 userProp，以便在 field 内部能够直接获取到 toModelName
         // 以便能够通过 fieldInstance.toModelName 获取准确的 toModelName
 <span class="cstat-no" title="statement not covered" >        fieldInstance.userProp = userPropsField;</span>
       }
       
-      const toModelName = <span class="cstat-no" title="statement not covered" >fieldInstance.toModelName;</span>
-      const modelClass = <span class="cstat-no" title="statement not covered" >this.orm.get(toModelName);</span>
+      const toModelName = fieldInstance.toModelName;
+      const modelClass = this.orm.get(toModelName);
 <span class="cstat-no" title="statement not covered" >      if (fieldInstance.lazy) {</span>
 <span class="cstat-no" title="statement not covered" >        fieldInstance.install(modelClass, fieldName, fieldInstance, this.orm);</span>
       }
@@ -1972,7 +1972,7 @@ export default Model;
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Aug 20 2018 23:14:33 GMT+0800 (CST)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Aug 23 2018 23:25:10 GMT+0800 (CST)
 </div>
 </div>
 <script src="prettify.js"></script>

@@ -76,11 +76,11 @@ const Model = class Model {
    * @return {string} The id attribute of this {@link Model}.
    */
   static get idAttribute () {
-    return this.session.db.describe(this.modelName).idAttribute;
+    return this.session.db.getTableByTableName(this.modelName).idAttribute;
   }
   
   static get candidateIdKes () {
-    return this.session.db.describe(this.modelName).candidateIdKes;
+    return this.session.db.getTableByTableName(this.modelName).candidateIdKes;
   }
   
   /**
@@ -240,7 +240,7 @@ const Model = class Model {
           `The Model ${this.modelName} has field key: ${fieldName}, but the object which you pass doesn't have the key`
         );
       }
-  
+      
       if (fieldInstance.lazy === undefined) {
         throw Error(`modelInstance.lazy can't be undefined, please file an issue!`);
       } else if (fieldInstance.lazy) {
